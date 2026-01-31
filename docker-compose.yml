@@ -17,6 +17,8 @@ services:
       - ./:/workspace:ro
     environment:
       - NODE_ENV=production
+      # 设置为 true 以在启动后运行测试包安装
+      - RUN_INSTALL_TEST=false
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3456/api/pm/detect"]

@@ -1,4 +1,4 @@
-import type { PackageInfo } from '@dext7r/npvm-shared';
+import type { PackageInfo, NpmSearchObject } from '@dext7r/npvm-shared';
 
 const NPM_REGISTRY = 'https://registry.npmjs.org';
 
@@ -52,7 +52,7 @@ export async function searchPackages(
     if (!response.ok) return [];
 
     const data = await response.json();
-    return (data.objects || []).map((obj: any) => ({
+    return (data.objects || []).map((obj: NpmSearchObject) => ({
       name: obj.package.name,
       description: obj.package.description || '',
       version: obj.package.version,

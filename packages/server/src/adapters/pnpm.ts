@@ -6,8 +6,11 @@ import type {
   InstalledPackage,
   DependencyNode,
   AuditResult,
+  AuditFixResult,
   OperationProgress,
   VulnerabilityInfo,
+  DependencyInfo,
+  NpmAuditAdvisory,
 } from '@dext7r/npvm-shared';
 import type { PackageManagerAdapter, InstallOptions, UninstallOptions } from './base.js';
 
@@ -39,7 +42,7 @@ export class PnpmAdapter implements PackageManagerAdapter {
       const deps = list?.dependencies || {};
       const devDeps = list?.devDependencies || {};
 
-      for (const [name, info] of Object.entries(deps) as [string, any][]) {
+      for (const [name, info] of Object.entries(deps) as [string, DependencyInfo][]) {
         packages.push({
           name,
           version: info.version || 'unknown',
@@ -49,7 +52,7 @@ export class PnpmAdapter implements PackageManagerAdapter {
         });
       }
 
-      for (const [name, info] of Object.entries(devDeps) as [string, any][]) {
+      for (const [name, info] of Object.entries(devDeps) as [string, DependencyInfo][]) {
         packages.push({
           name,
           version: info.version || 'unknown',
@@ -74,7 +77,7 @@ export class PnpmAdapter implements PackageManagerAdapter {
       const list = Array.isArray(data) ? data[0] : data;
       const deps = list?.dependencies || {};
 
-      for (const [name, info] of Object.entries(deps) as [string, any][]) {
+      for (const [name, info] of Object.entries(deps) as [string, DependencyInfo][]) {
         packages.push({
           name,
           version: info.version || 'unknown',
@@ -213,7 +216,7 @@ export class PnpmAdapter implements PackageManagerAdapter {
   private parseDepTree(
     name: string,
     version: string,
-    deps?: Record<string, any>
+    deps?: Record<string, DependencyInfo>
   ): DependencyNode {
     const node: DependencyNode = { name, version, children: [] };
     if (deps) {
@@ -228,19 +231,42 @@ export class PnpmAdapter implements PackageManagerAdapter {
 
   async audit(cwd: string): Promise<AuditResult> {
     try {
-      const { stdout } = await execa('pnpm', ['audit', '--json'], { cwd, reject: false });
+      console.warn(`[pnpm audit] Running: pnpm audit --json in ${cwd}`);
+      const { stdout, stderr, exitCode } = await execa('pnpm', ['audit', '--json'], {
+        cwd,
+        reject: false
+      });
+
+      if (stderr) {
+        console.warn(`[pnpm audit] stderr:`, stderr);
+      }
+
+      console.warn(`[pnpm audit] Exit code: ${exitCode}`);
+      console.warn(`[pnpm audit] Raw output length: ${stdout.length} bytes`);
+
+      if (!stdout || stdout.trim().length === 0) {
+        console.warn('[pnpm audit] Empty output from pnpm audit');
+        return {
+          vulnerabilities: [],
+          summary: { critical: 0, high: 0, moderate: 0, low: 0, total: 0 },
+        };
+      }
+
       const data = JSON.parse(stdout);
+      console.warn(`[pnpm audit] Parsed data keys:`, Object.keys(data));
+
       const vulnerabilities: VulnerabilityInfo[] = [];
 
+      // pnpm 使用 advisories 对象
       const advisories = data.advisories || {};
-      for (const [, adv] of Object.entries(advisories) as [string, any][]) {
+      for (const [, adv] of Object.entries(advisories) as [string, NpmAuditAdvisory][]) {
         vulnerabilities.push({
-          id: String(adv.id),
-          title: adv.title,
-          severity: adv.severity,
-          package: adv.module_name,
-          version: adv.vulnerable_versions,
-          recommendation: adv.recommendation,
+          id: String(adv.id || 'unknown'),
+          title: adv.title || 'Unknown vulnerability',
+          severity: (adv.severity as 'critical' | 'high' | 'moderate' | 'low') || 'moderate',
+          package: adv.module_name || 'unknown',
+          version: adv.vulnerable_versions || '*',
+          recommendation: adv.recommendation || 'Update to latest version',
           url: adv.url,
         });
       }
@@ -254,11 +280,67 @@ export class PnpmAdapter implements PackageManagerAdapter {
         total: meta.total || vulnerabilities.length,
       };
 
+      console.warn(`[pnpm audit] Found ${vulnerabilities.length} vulnerabilities:`, summary);
       return { vulnerabilities, summary };
-    } catch {
+    } catch (error) {
+      console.error('[pnpm audit] Error:', error);
       return {
         vulnerabilities: [],
         summary: { critical: 0, high: 0, moderate: 0, low: 0, total: 0 },
+      };
+    }
+  }
+
+  async auditFix(cwd: string, onProgress?: (progress: OperationProgress) => void): Promise<AuditFixResult> {
+    const logs: string[] = [];
+    const operationId = randomUUID();
+    const progress: OperationProgress = {
+      id: operationId,
+      type: 'audit',
+      status: 'running',
+      progress: 0,
+      message: 'Fixing vulnerabilities...',
+      logs: [],
+      startedAt: Date.now(),
+    };
+
+    onProgress?.(progress);
+
+    try {
+      const beforeAudit = await this.audit(cwd);
+      const beforeCount = beforeAudit.summary.total;
+
+      progress.progress = 20;
+      progress.message = 'Running pnpm audit --fix...';
+      onProgress?.(progress);
+
+      const { stdout, stderr } = await execa('pnpm', ['audit', '--fix'], { cwd, reject: false });
+      if (stdout) logs.push(stdout);
+      if (stderr) logs.push(stderr);
+
+      progress.progress = 70;
+      progress.message = 'Re-scanning...';
+      onProgress?.(progress);
+
+      const remaining = await this.audit(cwd);
+      const fixed = Math.max(0, beforeCount - remaining.summary.total);
+
+      progress.status = 'completed';
+      progress.progress = 100;
+      progress.message = `Fixed ${fixed} vulnerabilities`;
+      progress.completedAt = Date.now();
+      onProgress?.(progress);
+
+      return { fixed, remaining, logs };
+    } catch (error) {
+      console.error('[pnpm audit fix] Error:', error);
+      progress.status = 'failed';
+      progress.message = String(error);
+      onProgress?.(progress);
+      return {
+        fixed: 0,
+        remaining: { vulnerabilities: [], summary: { critical: 0, high: 0, moderate: 0, low: 0, total: 0 } },
+        logs,
       };
     }
   }

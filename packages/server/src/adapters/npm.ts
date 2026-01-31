@@ -6,8 +6,12 @@ import type {
   InstalledPackage,
   DependencyNode,
   AuditResult,
+  AuditFixResult,
   OperationProgress,
   VulnerabilityInfo,
+  DependencyInfo,
+  NpmAuditVulnerability,
+  NpmAuditAdvisory,
 } from '@dext7r/npvm-shared';
 import type { PackageManagerAdapter, InstallOptions, UninstallOptions } from './base.js';
 
@@ -36,7 +40,7 @@ export class NpmAdapter implements PackageManagerAdapter {
       const packages: InstalledPackage[] = [];
 
       const deps = data.dependencies || {};
-      for (const [name, info] of Object.entries(deps) as [string, any][]) {
+      for (const [name, info] of Object.entries(deps) as [string, { version?: string }][]) {
         packages.push({
           name,
           version: info.version || 'unknown',
@@ -59,7 +63,7 @@ export class NpmAdapter implements PackageManagerAdapter {
       const packages: InstalledPackage[] = [];
 
       const deps = data.dependencies || {};
-      for (const [name, info] of Object.entries(deps) as [string, any][]) {
+      for (const [name, info] of Object.entries(deps) as [string, { version?: string }][]) {
         packages.push({
           name,
           version: info.version || 'unknown',
@@ -197,7 +201,7 @@ export class NpmAdapter implements PackageManagerAdapter {
   private parseDepTree(
     name: string,
     version: string,
-    deps?: Record<string, any>
+    deps?: Record<string, DependencyInfo>
   ): DependencyNode {
     const node: DependencyNode = { name, version, children: [] };
     if (deps) {
@@ -212,22 +216,69 @@ export class NpmAdapter implements PackageManagerAdapter {
 
   async audit(cwd: string): Promise<AuditResult> {
     try {
-      const { stdout } = await execa('npm', ['audit', '--json'], { cwd, reject: false });
+      console.warn(`[npm audit] Running: npm audit --json in ${cwd}`);
+      const { stdout, stderr, exitCode } = await execa('npm', ['audit', '--json'], {
+        cwd,
+        reject: false
+      });
+
+      if (stderr) {
+        console.warn(`[npm audit] stderr:`, stderr);
+      }
+
+      console.warn(`[npm audit] Exit code: ${exitCode}`);
+      console.warn(`[npm audit] Raw output length: ${stdout.length} bytes`);
+
+      if (!stdout || stdout.trim().length === 0) {
+        console.warn('[npm audit] Empty output from npm audit');
+        return {
+          vulnerabilities: [],
+          summary: { critical: 0, high: 0, moderate: 0, low: 0, total: 0 },
+        };
+      }
+
       const data = JSON.parse(stdout);
+      console.warn(`[npm audit] Parsed data keys:`, Object.keys(data));
 
       const vulnerabilities: VulnerabilityInfo[] = [];
-      const advisories = data.advisories || data.vulnerabilities || {};
 
-      for (const [, advisory] of Object.entries(advisories) as [string, any][]) {
-        vulnerabilities.push({
-          id: String(advisory.id || advisory.via?.[0]?.source || 'unknown'),
-          title: advisory.title || advisory.via?.[0]?.title || 'Unknown vulnerability',
-          severity: advisory.severity || 'moderate',
-          package: advisory.module_name || advisory.name || 'unknown',
-          version: advisory.vulnerable_versions || advisory.range || '*',
-          recommendation: advisory.recommendation || advisory.fixAvailable?.name || 'Update to latest version',
-          url: advisory.url || advisory.via?.[0]?.url,
-        });
+      // npm v7+ 使用 vulnerabilities 对象
+      if (data.vulnerabilities && typeof data.vulnerabilities === 'object') {
+        for (const [pkgName, vuln] of Object.entries(data.vulnerabilities) as [string, NpmAuditVulnerability][]) {
+          if (!vuln.via || vuln.via.length === 0) continue;
+
+          for (const via of vuln.via) {
+            if (typeof via === 'object' && via.title) {
+              const fixInfo = typeof vuln.fixAvailable === 'object' ? vuln.fixAvailable : null;
+              vulnerabilities.push({
+                id: String(via.source || via.cve || 'unknown'),
+                title: via.title,
+                severity: (vuln.severity as 'critical' | 'high' | 'moderate' | 'low') || 'moderate',
+                package: pkgName,
+                version: vuln.range || '*',
+                recommendation: fixInfo
+                  ? `Update to ${fixInfo.name}@${fixInfo.version}`
+                  : 'Update to latest version',
+                url: via.url,
+              });
+            }
+          }
+        }
+      }
+
+      // npm v6 使用 advisories 对象
+      if (data.advisories && typeof data.advisories === 'object') {
+        for (const [, advisory] of Object.entries(data.advisories) as [string, NpmAuditAdvisory][]) {
+          vulnerabilities.push({
+            id: String(advisory.id || 'unknown'),
+            title: advisory.title || 'Unknown vulnerability',
+            severity: (advisory.severity as 'critical' | 'high' | 'moderate' | 'low') || 'moderate',
+            package: advisory.module_name || 'unknown',
+            version: advisory.vulnerable_versions || '*',
+            recommendation: advisory.recommendation || 'Update to latest version',
+            url: advisory.url,
+          });
+        }
       }
 
       const summary = {
@@ -238,11 +289,67 @@ export class NpmAdapter implements PackageManagerAdapter {
         total: data.metadata?.vulnerabilities?.total || vulnerabilities.length,
       };
 
+      console.warn(`[npm audit] Found ${vulnerabilities.length} vulnerabilities:`, summary);
       return { vulnerabilities, summary };
-    } catch {
+    } catch (error) {
+      console.error('[npm audit] Error:', error);
       return {
         vulnerabilities: [],
         summary: { critical: 0, high: 0, moderate: 0, low: 0, total: 0 },
+      };
+    }
+  }
+
+  async auditFix(cwd: string, onProgress?: (progress: OperationProgress) => void): Promise<AuditFixResult> {
+    const logs: string[] = [];
+    const operationId = randomUUID();
+    const progress: OperationProgress = {
+      id: operationId,
+      type: 'audit',
+      status: 'running',
+      progress: 0,
+      message: 'Fixing vulnerabilities...',
+      logs: [],
+      startedAt: Date.now(),
+    };
+
+    onProgress?.(progress);
+
+    try {
+      const beforeAudit = await this.audit(cwd);
+      const beforeCount = beforeAudit.summary.total;
+
+      progress.progress = 20;
+      progress.message = 'Running npm audit fix...';
+      onProgress?.(progress);
+
+      const { stdout, stderr } = await execa('npm', ['audit', 'fix'], { cwd, reject: false });
+      if (stdout) logs.push(stdout);
+      if (stderr) logs.push(stderr);
+
+      progress.progress = 70;
+      progress.message = 'Re-scanning...';
+      onProgress?.(progress);
+
+      const remaining = await this.audit(cwd);
+      const fixed = Math.max(0, beforeCount - remaining.summary.total);
+
+      progress.status = 'completed';
+      progress.progress = 100;
+      progress.message = `Fixed ${fixed} vulnerabilities`;
+      progress.completedAt = Date.now();
+      onProgress?.(progress);
+
+      return { fixed, remaining, logs };
+    } catch (error) {
+      console.error('[npm audit fix] Error:', error);
+      progress.status = 'failed';
+      progress.message = String(error);
+      onProgress?.(progress);
+      return {
+        fixed: 0,
+        remaining: { vulnerabilities: [], summary: { critical: 0, high: 0, moderate: 0, low: 0, total: 0 } },
+        logs,
       };
     }
   }

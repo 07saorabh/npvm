@@ -21,6 +21,7 @@
   "dependencies": {
     "@dext7r/npvm-shared": "workspace:*",
     "@tanstack/react-query": "^5.64.0",
+    "@tanstack/react-virtual": "^3.13.18",
     "clsx": "^2.1.0",
     "i18next": "^24.2.3",
     "i18next-browser-languagedetector": "^8.2.0",

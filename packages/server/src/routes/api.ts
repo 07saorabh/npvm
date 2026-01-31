@@ -288,6 +288,33 @@ export async function registerRoutes(app: FastifyInstance, state: AppState) {
     reply.raw.end();
   });
 
+  // 安全审计修复
+  app.post('/api/security/fix', async (_request, reply) => {
+    const adapter = getAdapter(state.currentPm);
+
+    reply.raw.setHeader('Content-Type', 'text/event-stream');
+    reply.raw.setHeader('Cache-Control', 'no-cache');
+    reply.raw.setHeader('Connection', 'keep-alive');
+
+    try {
+      const result = await adapter.auditFix(
+        state.projectPath,
+        (progress) => {
+          reply.raw.write(`data: ${JSON.stringify({ type: 'progress', data: progress })}\n\n`);
+        }
+      );
+
+      reply.raw.write(`data: ${JSON.stringify({ type: 'result', data: result })}\n\n`);
+      reply.raw.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+    } catch (error) {
+      reply.raw.write(
+        `data: ${JSON.stringify({ type: 'error', message: String(error) })}\n\n`
+      );
+    }
+
+    reply.raw.end();
+  });
+
   // 检查包更新状态
   app.post<{ Body: { packages: { name: string; version: string }[] } }>(
     '/api/packages/check-updates',
@@ -310,4 +337,65 @@ export async function registerRoutes(app: FastifyInstance, state: AppState) {
       }
     }
   );
+
+  // 获取缓存大小
+  app.get('/api/cache/size', async () => {
+    const { execa } = await import('execa');
+    try {
+      let size = 'Unknown';
+
+      switch (state.currentPm) {
+        case 'npm': {
+          const { stdout } = await execa('npm', ['cache', 'ls'], { reject: false });
+          const lines = stdout.split('\n').filter(Boolean);
+          size = `${lines.length} entries`;
+          break;
+        }
+        case 'yarn': {
+          const { stdout } = await execa('yarn', ['cache', 'dir']);
+          const cacheDir = stdout.trim();
+          const { stdout: duOut } = await execa('du', ['-sh', cacheDir], { reject: false });
+          size = duOut.split('\t')[0] || 'Unknown';
+          break;
+        }
+        case 'pnpm': {
+          const { stdout } = await execa('pnpm', ['store', 'status'], { reject: false });
+          size = stdout.includes('Store path') ? 'Active' : 'Unknown';
+          break;
+        }
+        case 'bun': {
+          size = 'N/A';
+          break;
+        }
+      }
+
+      return { success: true, data: { size } };
+    } catch {
+      return { success: true, data: { size: 'Unknown' } };
+    }
+  });
+
+  // 清除缓存
+  app.post('/api/cache/clear', async () => {
+    const { execa } = await import('execa');
+    try {
+      switch (state.currentPm) {
+        case 'npm':
+          await execa('npm', ['cache', 'clean', '--force']);
+          break;
+        case 'yarn':
+          await execa('yarn', ['cache', 'clean']);
+          break;
+        case 'pnpm':
+          await execa('pnpm', ['store', 'prune']);
+          break;
+        case 'bun':
+          // Bun doesn't have a cache clear command
+          break;
+      }
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
 }

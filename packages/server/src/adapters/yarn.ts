@@ -6,8 +6,12 @@ import type {
   InstalledPackage,
   DependencyNode,
   AuditResult,
+  AuditFixResult,
   OperationProgress,
   VulnerabilityInfo,
+  YarnTreeChild,
+  YarnTreeData,
+  YarnAuditAdvisory,
 } from '@dext7r/npvm-shared';
 import type { PackageManagerAdapter, InstallOptions, UninstallOptions } from './base.js';
 
@@ -220,7 +224,7 @@ export class YarnAdapter implements PackageManagerAdapter {
     }
   }
 
-  private parseYarnTree(data: any): DependencyNode {
+  private parseYarnTree(data: YarnTreeData): DependencyNode {
     const node: DependencyNode = {
       name: 'root',
       version: '0.0.0',
@@ -237,10 +241,10 @@ export class YarnAdapter implements PackageManagerAdapter {
             children: [],
           };
           if (tree.children) {
-            child.children = tree.children.map((c: any) => {
+            child.children = tree.children.map((c: YarnTreeChild) => {
               const m = c.name?.match(/^(.+)@(.+)$/);
               return {
-                name: m?.[1] || c.name,
+                name: m?.[1] || c.name || 'unknown',
                 version: m?.[2] || 'unknown',
                 children: [],
               };
@@ -256,7 +260,27 @@ export class YarnAdapter implements PackageManagerAdapter {
 
   async audit(cwd: string): Promise<AuditResult> {
     try {
-      const { stdout } = await execa('yarn', ['audit', '--json'], { cwd, reject: false });
+      console.warn(`[yarn audit] Running: yarn audit --json in ${cwd}`);
+      const { stdout, stderr, exitCode } = await execa('yarn', ['audit', '--json'], {
+        cwd,
+        reject: false
+      });
+
+      if (stderr) {
+        console.warn(`[yarn audit] stderr:`, stderr);
+      }
+
+      console.warn(`[yarn audit] Exit code: ${exitCode}`);
+      console.warn(`[yarn audit] Raw output length: ${stdout.length} bytes`);
+
+      if (!stdout || stdout.trim().length === 0) {
+        console.warn('[yarn audit] Empty output from yarn audit');
+        return {
+          vulnerabilities: [],
+          summary: { critical: 0, high: 0, moderate: 0, low: 0, total: 0 },
+        };
+      }
+
       const lines = stdout.trim().split('\n');
       const vulnerabilities: VulnerabilityInfo[] = [];
       let summary = { critical: 0, high: 0, moderate: 0, low: 0, total: 0 };
@@ -264,34 +288,96 @@ export class YarnAdapter implements PackageManagerAdapter {
       for (const line of lines) {
         try {
           const data = JSON.parse(line);
+          console.warn(`[yarn audit] Line type: ${data.type}`);
+
           if (data.type === 'auditAdvisory') {
-            const adv = data.data.advisory;
+            const adv = data.data.advisory as YarnAuditAdvisory;
             vulnerabilities.push({
-              id: String(adv.id),
-              title: adv.title,
-              severity: adv.severity,
-              package: adv.module_name,
-              version: adv.vulnerable_versions,
-              recommendation: adv.recommendation,
+              id: String(adv.id || 'unknown'),
+              title: adv.title || 'Unknown vulnerability',
+              severity: (adv.severity as 'critical' | 'high' | 'moderate' | 'low') || 'moderate',
+              package: adv.module_name || 'unknown',
+              version: adv.vulnerable_versions || '*',
+              recommendation: adv.recommendation || 'Update to latest version',
               url: adv.url,
             });
           } else if (data.type === 'auditSummary') {
+            const vulns = data.data.vulnerabilities || {};
             summary = {
-              critical: data.data.vulnerabilities.critical || 0,
-              high: data.data.vulnerabilities.high || 0,
-              moderate: data.data.vulnerabilities.moderate || 0,
-              low: data.data.vulnerabilities.low || 0,
-              total: data.data.vulnerabilities.total || 0,
+              critical: vulns.critical || 0,
+              high: vulns.high || 0,
+              moderate: vulns.moderate || 0,
+              low: vulns.low || 0,
+              total: vulns.total || 0,
             };
           }
-        } catch { /* ignore parse errors */ }
+        } catch {
+          console.warn('[yarn audit] Failed to parse line:', line.substring(0, 100));
+        }
       }
 
+      console.warn(`[yarn audit] Found ${vulnerabilities.length} vulnerabilities:`, summary);
       return { vulnerabilities, summary };
-    } catch {
+    } catch (error) {
+      console.error('[yarn audit] Error:', error);
       return {
         vulnerabilities: [],
         summary: { critical: 0, high: 0, moderate: 0, low: 0, total: 0 },
+      };
+    }
+  }
+
+  async auditFix(cwd: string, onProgress?: (progress: OperationProgress) => void): Promise<AuditFixResult> {
+    const logs: string[] = [];
+    const operationId = randomUUID();
+    const progress: OperationProgress = {
+      id: operationId,
+      type: 'audit',
+      status: 'running',
+      progress: 0,
+      message: 'Fixing vulnerabilities...',
+      logs: [],
+      startedAt: Date.now(),
+    };
+
+    onProgress?.(progress);
+
+    try {
+      const beforeAudit = await this.audit(cwd);
+      const beforeCount = beforeAudit.summary.total;
+
+      progress.progress = 20;
+      progress.message = 'Running yarn upgrade...';
+      onProgress?.(progress);
+
+      // Yarn v1 doesn't have audit fix, use upgrade instead
+      const { stdout, stderr } = await execa('yarn', ['upgrade'], { cwd, reject: false });
+      if (stdout) logs.push(stdout);
+      if (stderr) logs.push(stderr);
+
+      progress.progress = 70;
+      progress.message = 'Re-scanning...';
+      onProgress?.(progress);
+
+      const remaining = await this.audit(cwd);
+      const fixed = Math.max(0, beforeCount - remaining.summary.total);
+
+      progress.status = 'completed';
+      progress.progress = 100;
+      progress.message = `Fixed ${fixed} vulnerabilities`;
+      progress.completedAt = Date.now();
+      onProgress?.(progress);
+
+      return { fixed, remaining, logs };
+    } catch (error) {
+      console.error('[yarn audit fix] Error:', error);
+      progress.status = 'failed';
+      progress.message = String(error);
+      onProgress?.(progress);
+      return {
+        fixed: 0,
+        remaining: { vulnerabilities: [], summary: { critical: 0, high: 0, moderate: 0, low: 0, total: 0 } },
+        logs,
       };
     }
   }

@@ -4,6 +4,7 @@ import type {
   InstalledPackage,
   DependencyNode,
   AuditResult,
+  AuditFixResult,
   OperationProgress,
 } from '@dext7r/npvm-shared';
 
@@ -49,6 +50,8 @@ export interface PackageManagerAdapter {
   getDependencyTree(cwd: string): Promise<DependencyNode>;
 
   audit(cwd: string): Promise<AuditResult>;
+
+  auditFix(cwd: string, onProgress?: (progress: OperationProgress) => void): Promise<AuditFixResult>;
 
   setRegistry(url: string): Promise<void>;
 

@@ -1,16 +1,21 @@
 import { Moon, Sun, FolderOpen, Languages, Menu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAppStore } from '../../stores/app';
 import { usePackageManagers } from '../../hooks/usePackages';
+import { fetchApi } from '../../lib/api';
 import { Select } from '../ui/Select';
 import { Tooltip } from '../ui/Tooltip';
+import { useToast } from '../ui/Toast';
 import type { PackageManagerType } from '@dext7r/npvm-shared';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 export function Header() {
   const { t, i18n } = useTranslation();
   const { isDarkMode, toggleDarkMode, currentPm, setCurrentPm, projectPath, setMobileMenuOpen } = useAppStore();
   const { data: managers = [] } = usePackageManagers();
+  const { addToast } = useToast();
+  const queryClient = useQueryClient();
 
   const availableManagers = managers.filter((m) => m.available);
 
@@ -22,6 +27,33 @@ export function Header() {
       })),
     [availableManagers]
   );
+
+  const handleSwitchPm = useCallback(async (type: PackageManagerType) => {
+    if (type === currentPm) return;
+
+    const prevPm = currentPm;
+    setCurrentPm(type);
+
+    try {
+      await fetchApi('/pm/current', {
+        method: 'PUT',
+        body: JSON.stringify({ type }),
+      });
+      queryClient.invalidateQueries({ queryKey: ['packages'] });
+      addToast({
+        type: 'success',
+        title: t('dashboard.pmSwitched'),
+        message: t('dashboard.pmSwitchedTo', { pm: type }),
+      });
+    } catch {
+      setCurrentPm(prevPm);
+      addToast({
+        type: 'error',
+        title: t('dashboard.pmSwitchFailed'),
+        message: t('dashboard.pmSwitchFailedMsg'),
+      });
+    }
+  }, [currentPm, setCurrentPm, queryClient, addToast, t]);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'zh' ? 'en' : 'zh';
@@ -47,7 +79,7 @@ export function Header() {
       <div className="flex items-center gap-2 sm:gap-3">
         <Select
           value={currentPm}
-          onChange={(v) => setCurrentPm(v as PackageManagerType)}
+          onChange={(v) => handleSwitchPm(v as PackageManagerType)}
           options={pmOptions}
           size="sm"
         />

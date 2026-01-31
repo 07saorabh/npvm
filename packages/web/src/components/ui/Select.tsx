@@ -58,7 +58,11 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
 
     useEffect(() => {
       const handleClickOutside = (e: MouseEvent) => {
-        if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        const target = e.target as Node;
+        if (
+          containerRef.current && !containerRef.current.contains(target) &&
+          (!listRef.current || !listRef.current.contains(target))
+        ) {
           setIsOpen(false);
         }
       };

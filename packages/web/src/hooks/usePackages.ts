@@ -7,6 +7,8 @@ import type {
   InstalledPackage,
   DependencyNode,
   AuditResult,
+  AuditReport,
+  AuditFixResult,
   OperationProgress,
   RemoteAnalysisResult,
 } from '@dext7r/npvm-shared';
@@ -190,11 +192,12 @@ interface AuditSSEData {
 }
 
 export function useSecurityAudit() {
-  const { addTerminalLog } = useAppStore();
+  const { addTerminalLog, currentPm, projectPath, setLastAuditReport } = useAppStore();
 
   return useMutation({
     mutationFn: async () => {
-      return new Promise<AuditResult>((resolve, reject) => {
+      const startTime = Date.now();
+      return new Promise<AuditReport>((resolve, reject) => {
         let result: AuditResult | null = null;
 
         createSSEConnection(
@@ -210,7 +213,73 @@ export function useSecurityAudit() {
           },
           () => {
             if (result) {
-              resolve(result);
+              const report: AuditReport = {
+                metadata: {
+                  projectPath,
+                  packageManager: currentPm,
+                  scannedAt: Date.now(),
+                  duration: Date.now() - startTime,
+                  totalPackages: result.summary.total,
+                },
+                result,
+              };
+              setLastAuditReport(report);
+              resolve(report);
+            } else {
+              reject(new Error('No result received'));
+            }
+          },
+          (error) => {
+            reject(new Error(error));
+          }
+        );
+      });
+    },
+  });
+}
+
+interface AuditFixSSEData {
+  type: 'progress' | 'result';
+  data?: OperationProgress | AuditFixResult;
+}
+
+export function useAuditFix() {
+  const { addTerminalLog, setLastAuditReport, currentPm, projectPath } = useAppStore();
+
+  return useMutation({
+    mutationFn: async () => {
+      const startTime = Date.now();
+      return new Promise<AuditFixResult>((resolve, reject) => {
+        let fixResult: AuditFixResult | null = null;
+
+        createSSEConnection(
+          '/security/fix',
+          {},
+          (data) => {
+            const fixData = data as AuditFixSSEData;
+            if (fixData.type === 'progress' && fixData.data) {
+              const progress = fixData.data as OperationProgress;
+              if (progress.message) {
+                addTerminalLog(progress.message);
+              }
+            } else if (fixData.type === 'result' && fixData.data) {
+              fixResult = fixData.data as AuditFixResult;
+            }
+          },
+          () => {
+            if (fixResult) {
+              const report: AuditReport = {
+                metadata: {
+                  projectPath,
+                  packageManager: currentPm,
+                  scannedAt: Date.now(),
+                  duration: Date.now() - startTime,
+                  totalPackages: fixResult.remaining.summary.total,
+                },
+                result: fixResult.remaining,
+              };
+              setLastAuditReport(report);
+              resolve(fixResult);
             } else {
               reject(new Error('No result received'));
             }

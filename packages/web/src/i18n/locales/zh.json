@@ -67,13 +67,17 @@
     "type": "类型",
     "actions": "操作",
     "noPackages": "暂无已安装的包",
+    "noMatch": "没有匹配的包",
     "confirmUninstall": "确定卸载 {{name}}？",
     "confirmUpdateAll": "确定升级 {{count}} 个包？",
     "updateAll": "升级所有包",
     "globalMode": "全局",
     "projectMode": "项目",
     "switchToProject": "切换至项目模式",
-    "switchToGlobal": "切换至全局模式"
+    "switchToGlobal": "切换至全局模式",
+    "filterPlaceholder": "过滤包...",
+    "showing": "第 {{start}}-{{end}} 项，共 {{total}} 项",
+    "deprecated": "已废弃"
   },
   "deps": {
     "title": "依赖树",
@@ -92,7 +96,29 @@
     "high": "高危",
     "moderate": "中等",
     "low": "低危",
-    "moreInfo": "了解更多"
+    "moreInfo": "了解更多",
+    "fixAll": "一键修复",
+    "fixThis": "修复",
+    "fixing": "修复中...",
+    "export": "导出",
+    "exportJson": "导出 JSON",
+    "exportCsv": "导出 CSV",
+    "exportHtml": "导出 HTML",
+    "lastScan": "上次扫描",
+    "duration": "耗时",
+    "packagesScanned": "个包已扫描",
+    "filterBySeverity": "严重级别",
+    "filterAll": "全部",
+    "searchPlaceholder": "搜索漏洞...",
+    "fixSuccess": "已修复 {{count}} 个漏洞",
+    "fixFailed": "修复失败",
+    "noFixAvailable": "无自动修复方案",
+    "remainingVulns": "剩余 {{count}} 个漏洞",
+    "reportTitle": "安全审计报告",
+    "projectPath": "项目路径",
+    "packageManager": "包管理器",
+    "scanTime": "扫描时间",
+    "totalVulnerabilities": "漏洞总数"
   },
   "settings": {
     "title": "设置",
@@ -104,7 +130,34 @@
     "testConnection": "测试",
     "reset": "重置",
     "connectionFailed": "连接失败，请检查地址",
-    "connectionSuccess": "连接成功！正在刷新..."
+    "connectionSuccess": "连接成功！正在刷新...",
+    "theme": "主题",
+    "themeLight": "浅色",
+    "themeDark": "深色",
+    "themeSystem": "跟随系统",
+    "themeHint": "选择您偏好的主题色",
+    "cache": "缓存",
+    "cacheHint": "管理包管理器缓存",
+    "clearCache": "清除缓存",
+    "clearCacheConfirm": "这将清除所有已缓存的包。确定继续？",
+    "clearingCache": "清除中...",
+    "cacheCleared": "缓存已清除",
+    "cacheClearFailed": "清除缓存失败",
+    "cacheSize": "缓存大小",
+    "calculating": "计算中...",
+    "about": "关于",
+    "version": "版本",
+    "license": "许可证",
+    "repository": "仓库",
+    "viewOnGitHub": "在 GitHub 上查看",
+    "stars": "星标",
+    "forks": "分支",
+    "openIssues": "待解决",
+    "lastUpdate": "最后更新",
+    "loading": "加载中...",
+    "loadFailed": "加载仓库信息失败",
+    "author": "作者",
+    "description": "现代化的 Node.js 包管理可视化平台"
   },
   "terminal": {
     "title": "终端",
@@ -193,5 +246,11 @@
   "changelog": {
     "title": "更新日志",
     "latest": "最新"
+  },
+  "notFound": {
+    "title": "页面未找到",
+    "description": "您访问的页面不存在或已被移动。",
+    "goBack": "返回上页",
+    "goHome": "返回首页"
   }
 }

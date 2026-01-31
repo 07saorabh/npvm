@@ -67,13 +67,17 @@
     "type": "Type",
     "actions": "Actions",
     "noPackages": "No packages installed",
+    "noMatch": "No packages match the filter",
     "confirmUninstall": "Uninstall {{name}}?",
     "confirmUpdateAll": "Update {{count}} packages?",
     "updateAll": "Update all packages",
     "globalMode": "Global",
     "projectMode": "Project",
     "switchToProject": "Switch to project mode",
-    "switchToGlobal": "Switch to global mode"
+    "switchToGlobal": "Switch to global mode",
+    "filterPlaceholder": "Filter packages...",
+    "showing": "{{start}}-{{end}} of {{total}}",
+    "deprecated": "Deprecated"
   },
   "deps": {
     "title": "Dependency Tree",
@@ -92,7 +96,29 @@
     "high": "High",
     "moderate": "Moderate",
     "low": "Low",
-    "moreInfo": "More info"
+    "moreInfo": "More info",
+    "fixAll": "Fix All",
+    "fixThis": "Fix",
+    "fixing": "Fixing...",
+    "export": "Export",
+    "exportJson": "Export JSON",
+    "exportCsv": "Export CSV",
+    "exportHtml": "Export HTML",
+    "lastScan": "Last scan",
+    "duration": "Duration",
+    "packagesScanned": "packages scanned",
+    "filterBySeverity": "Severity",
+    "filterAll": "All",
+    "searchPlaceholder": "Search vulnerabilities...",
+    "fixSuccess": "Fixed {{count}} vulnerabilities",
+    "fixFailed": "Fix failed",
+    "noFixAvailable": "No automatic fix available",
+    "remainingVulns": "{{count}} vulnerabilities remaining",
+    "reportTitle": "Security Audit Report",
+    "projectPath": "Project Path",
+    "packageManager": "Package Manager",
+    "scanTime": "Scan Time",
+    "totalVulnerabilities": "Total Vulnerabilities"
   },
   "settings": {
     "title": "Settings",
@@ -104,7 +130,34 @@
     "testConnection": "Test",
     "reset": "Reset",
     "connectionFailed": "Connection failed. Please check the URL.",
-    "connectionSuccess": "Connected! Reloading..."
+    "connectionSuccess": "Connected! Reloading...",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "themeHint": "Choose your preferred color theme",
+    "cache": "Cache",
+    "cacheHint": "Manage package manager cache",
+    "clearCache": "Clear Cache",
+    "clearCacheConfirm": "This will clear all cached packages. Continue?",
+    "clearingCache": "Clearing...",
+    "cacheCleared": "Cache cleared successfully",
+    "cacheClearFailed": "Failed to clear cache",
+    "cacheSize": "Cache Size",
+    "calculating": "Calculating...",
+    "about": "About",
+    "version": "Version",
+    "license": "License",
+    "repository": "Repository",
+    "viewOnGitHub": "View on GitHub",
+    "stars": "Stars",
+    "forks": "Forks",
+    "openIssues": "Open Issues",
+    "lastUpdate": "Last Update",
+    "loading": "Loading...",
+    "loadFailed": "Failed to load repo info",
+    "author": "Author",
+    "description": "A modern visual platform for managing Node.js packages"
   },
   "terminal": {
     "title": "Terminal",
@@ -193,5 +246,11 @@
   "changelog": {
     "title": "Changelog",
     "latest": "Latest"
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you're looking for doesn't exist or has been moved.",
+    "goBack": "Go Back",
+    "goHome": "Go Home"
   }
 }

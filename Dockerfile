@@ -20,6 +20,9 @@ RUN pnpm install --frozen-lockfile
 # 复制源代码
 COPY packages ./packages
 
+# 复制脚本目录
+COPY script ./script
+
 # 构建
 RUN pnpm build
 
@@ -61,6 +64,9 @@ COPY --from=builder /app/packages/web/package.json ./packages/web/
 # 仅安装生产依赖
 RUN pnpm install --frozen-lockfile --prod
 
+# 复制脚本目录
+COPY --from=builder /app/script ./script
+
 # 切换用户
 USER npvm
 
@@ -73,5 +79,5 @@ EXPOSE 3456
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3456/api/pm/detect || exit 1
 
-# 启动服务（server 托管前端静态文件）
-CMD ["node", "packages/server/dist/index.js"]
+# 启动服务（使用启动脚本）
+CMD ["sh", "script/docker-entrypoint.sh"]

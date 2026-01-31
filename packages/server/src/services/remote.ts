@@ -6,6 +6,8 @@ import type {
   VulnerabilityInfo,
   RemoteAnalysisResult,
   NpmPackageMeta,
+  NpmLockPackageEntry,
+  OsvVulnEvent,
 } from '@dext7r/npvm-shared';
 
 const NPM_REGISTRY = 'https://registry.npmjs.org';
@@ -217,7 +219,7 @@ function parseNpmLockFile(content: string): DependencyNode {
 
     // 构建一级依赖
     if (Object.keys(packages).length > 0) {
-      for (const [path, info] of Object.entries(packages) as [string, any][]) {
+      for (const [path, info] of Object.entries(packages) as [string, NpmLockPackageEntry][]) {
         if (path === '' || !path.startsWith('node_modules/')) continue;
 
         // 只处理一级依赖
@@ -231,7 +233,7 @@ function parseNpmLockFile(content: string): DependencyNode {
         }
       }
     } else if (Object.keys(deps).length > 0) {
-      for (const [name, info] of Object.entries(deps) as [string, any][]) {
+      for (const [name, info] of Object.entries(deps) as [string, NpmLockPackageEntry][]) {
         root.children.push({
           name,
           version: info.version || '0.0.0',
@@ -367,14 +369,15 @@ export async function checkVulnerabilities(
 
       for (const vuln of result.vulns || []) {
         const severity = mapOsvSeverity(vuln.severity || vuln.database_specific?.severity);
+        const fixEvent = vuln.affected?.[0]?.ranges?.[0]?.events?.find((e: OsvVulnEvent) => e.fixed);
         vulnerabilities.push({
           id: vuln.id,
           title: vuln.summary || vuln.id,
           severity,
           package: pkg.name,
           version: pkg.version,
-          recommendation: vuln.affected?.[0]?.ranges?.[0]?.events?.find((e: any) => e.fixed)?.fixed
-            ? `Upgrade to ${vuln.affected[0].ranges[0].events.find((e: any) => e.fixed).fixed}`
+          recommendation: fixEvent?.fixed
+            ? `Upgrade to ${fixEvent.fixed}`
             : 'No fix available',
           url: vuln.references?.[0]?.url,
         });

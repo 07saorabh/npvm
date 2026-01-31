@@ -1,6 +1,21 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, Plus, Trash2, RefreshCw, Package as PackageIcon, Globe, Folder, ArrowUp, AlertTriangle, Terminal } from 'lucide-react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import {
+  Search,
+  Plus,
+  Trash2,
+  RefreshCw,
+  Package as PackageIcon,
+  Globe,
+  Folder,
+  ArrowUp,
+  AlertTriangle,
+  Terminal,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+} from 'lucide-react';
 import {
   useInstalledPackages,
   useSearchPackages,
@@ -11,35 +26,48 @@ import {
 } from '../../hooks/usePackages';
 import { useAppStore } from '../../stores/app';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
-import { Card, Button, Badge, EmptyState } from '../ui';
+import { Card, Button, Badge, EmptyState, Select } from '../ui';
 import { clsx } from 'clsx';
+import type { InstalledPackage } from '@dext7r/npvm-shared';
+
+const PAGE_SIZE_OPTIONS = [
+  { value: '20', label: '20' },
+  { value: '50', label: '50' },
+  { value: '100', label: '100' },
+];
+
+const ROW_HEIGHT = 52;
 
 export function PackageList() {
   const { t } = useTranslation();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [npmSearchQuery, setNpmSearchQuery] = useState('');
+  const [filterQuery, setFilterQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [manualInput, setManualInput] = useState('');
   const [installAsDev, setInstallAsDev] = useState(false);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     type: 'uninstall' | 'updateAll';
     packageName?: string;
   }>({ open: false, type: 'uninstall' });
+
+  const parentRef = useRef<HTMLDivElement>(null);
+
   const { data: packages = [], isLoading, refetch } = useInstalledPackages();
-  const { data: searchResults = [] } = useSearchPackages(searchQuery);
+  const { data: searchResults = [] } = useSearchPackages(npmSearchQuery);
   const installMutation = useInstallPackage();
   const uninstallMutation = useUninstallPackage();
   const updateMutation = useUpdatePackage();
   const { isGlobal, setIsGlobal } = useAppStore();
 
-  // 检查包更新状态
   const packagesToCheck = useMemo(
     () => packages.map((p) => ({ name: p.name, version: p.version })),
     [packages]
   );
   const { data: updateInfo = [] } = useCheckUpdates(packagesToCheck);
 
-  // 创建更新信息映射
   const updateMap = useMemo(() => {
     const map = new Map<string, { hasUpdate: boolean; latestVersion: string; deprecated?: string }>();
     updateInfo.forEach((info) => {
@@ -52,16 +80,50 @@ export function PackageList() {
     return map;
   }, [updateInfo]);
 
+  // 本地过滤
+  const filteredPackages = useMemo(() => {
+    if (!filterQuery.trim()) return packages;
+    const query = filterQuery.toLowerCase();
+    return packages.filter((pkg) => pkg.name.toLowerCase().includes(query));
+  }, [packages, filterQuery]);
+
+  // 分页
+  const totalPages = Math.ceil(filteredPackages.length / pageSize);
+  const paginatedPackages = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filteredPackages.slice(start, start + pageSize);
+  }, [filteredPackages, page, pageSize]);
+
+  // 虚拟滚动
+  // eslint-disable-next-line react-hooks/incompatible-library
+  const virtualizer = useVirtualizer({
+    count: paginatedPackages.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => ROW_HEIGHT,
+    overscan: 5,
+  });
+
+  // 重置分页
+  const handleFilterChange = (value: string) => {
+    setFilterQuery(value);
+    setPage(1);
+  };
+
+  const handlePageSizeChange = (value: string) => {
+    setPageSize(Number(value));
+    setPage(1);
+  };
+
   const handleInstall = async (name: string, dev = false) => {
     await installMutation.mutateAsync({ packages: [name], dev });
     setShowSearch(false);
-    setSearchQuery('');
+    setNpmSearchQuery('');
   };
 
   const handleBatchInstall = async () => {
-    const packages = manualInput.trim().split(/\s+/).filter(Boolean);
-    if (packages.length === 0) return;
-    await installMutation.mutateAsync({ packages, dev: installAsDev });
+    const pkgs = manualInput.trim().split(/\s+/).filter(Boolean);
+    if (pkgs.length === 0) return;
+    await installMutation.mutateAsync({ packages: pkgs, dev: installAsDev });
     setManualInput('');
     setShowSearch(false);
   };
@@ -91,7 +153,6 @@ export function PackageList() {
     });
   };
 
-  // 统计可更新的包数量
   const updatableCount = updateInfo.filter((u) => u.hasUpdate).length;
   const updatablePackages = updateInfo.filter((u) => u.hasUpdate).map((u) => u.name);
 
@@ -105,12 +166,75 @@ export function PackageList() {
     setConfirmDialog({ open: false, type: 'updateAll' });
   };
 
+  const renderRow = (pkg: InstalledPackage) => {
+    const updateStatus = updateMap.get(pkg.name);
+    return (
+      <div className="flex items-center px-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
+        <div className="flex-1 min-w-0 py-3">
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-800 dark:text-gray-200 truncate">
+              {pkg.name}
+            </span>
+            {updateStatus?.deprecated && (
+              <span
+                className="flex items-center gap-1 px-1.5 py-0.5 text-xs bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 rounded flex-shrink-0"
+                title={updateStatus.deprecated}
+              >
+                <AlertTriangle size={10} />
+                {t('packages.deprecated')}
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="w-32 py-3">
+          <span className="text-gray-600 dark:text-gray-400">{pkg.version}</span>
+          {updateStatus?.hasUpdate && (
+            <span className="ml-2 text-xs text-primary-500 inline-flex items-center gap-1">
+              <ArrowUp size={10} />
+              {updateStatus.latestVersion}
+            </span>
+          )}
+        </div>
+        <div className="w-20 py-3">
+          <Badge variant={pkg.isDev ? 'warning' : 'success'} size="sm">
+            {pkg.isDev ? t('common.dev') : t('common.prod')}
+          </Badge>
+        </div>
+        <div className="w-24 py-3 flex items-center justify-end gap-1">
+          {updateStatus?.hasUpdate && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleUpdate(pkg.name)}
+              loading={updateMutation.isPending}
+              title={t('common.update')}
+            >
+              <ArrowUp size={16} className="text-primary-500" />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleUninstall(pkg.name)}
+            disabled={uninstallMutation.isPending}
+          >
+            <Trash2 size={16} className="text-red-500" />
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  const startItem = (page - 1) * pageSize + 1;
+  const endItem = Math.min(page * pageSize, filteredPackages.length);
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-            {isGlobal ? t('packages.globalTitle') : t('packages.title')} ({packages.length})
+            {isGlobal ? t('packages.globalTitle') : t('packages.title')} ({filteredPackages.length})
           </h2>
           <button
             onClick={toggleMode}
@@ -138,25 +262,18 @@ export function PackageList() {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => refetch()}
-          >
+          <Button variant="ghost" size="icon" onClick={() => refetch()}>
             <RefreshCw size={18} />
           </Button>
-          <Button
-            onClick={() => setShowSearch(!showSearch)}
-            leftIcon={<Plus size={18} />}
-          >
+          <Button onClick={() => setShowSearch(!showSearch)} leftIcon={<Plus size={18} />}>
             {t('packages.addPackage')}
           </Button>
         </div>
       </div>
 
+      {/* Add Package Panel */}
       {showSearch && (
         <Card className="space-y-4">
-          {/* 手动输入安装 */}
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Terminal size={16} className="text-gray-400" />
@@ -182,63 +299,40 @@ export function PackageList() {
                 />
                 <span className="text-sm text-gray-600 dark:text-gray-400">{t('common.dev')}</span>
               </label>
-              <Button
-                onClick={handleBatchInstall}
-                disabled={!manualInput.trim()}
-                loading={installMutation.isPending}
-              >
+              <Button onClick={handleBatchInstall} disabled={!manualInput.trim()} loading={installMutation.isPending}>
                 {t('common.install')}
               </Button>
             </div>
             <p className="mt-1.5 text-xs text-gray-500">{t('packages.quickInstallHint')}</p>
           </div>
 
-          {/* npm 搜索 */}
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
             <div className="relative">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                size={18}
-              />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               <input
                 type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={npmSearchQuery}
+                onChange={(e) => setNpmSearchQuery(e.target.value)}
                 placeholder={t('packages.searchPlaceholder')}
                 className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200"
               />
             </div>
-
             {searchResults.length > 0 && (
               <div className="mt-4 space-y-2 max-h-64 overflow-y-auto">
                 {searchResults.map((pkg) => (
-                  <div
-                    key={pkg.name}
-                    className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50"
-                  >
+                  <div key={pkg.name} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
                     <div>
                       <div className="font-medium text-gray-800 dark:text-gray-200">
                         {pkg.name}
                         <span className="ml-2 text-sm text-gray-500">{pkg.version}</span>
                       </div>
-                      <div className="text-sm text-gray-500 truncate max-w-md">
-                        {pkg.description}
-                      </div>
+                      <div className="text-sm text-gray-500 truncate max-w-md">{pkg.description}</div>
                     </div>
                     <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() => handleInstall(pkg.name)}
-                        loading={installMutation.isPending}
-                      >
+                      <Button size="sm" onClick={() => handleInstall(pkg.name)} loading={installMutation.isPending}>
                         {t('common.install')}
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleInstall(pkg.name, true)}
-                        disabled={installMutation.isPending}
-                      >
+                      <Button size="sm" variant="outline" onClick={() => handleInstall(pkg.name, true)} disabled={installMutation.isPending}>
                         {t('common.dev')}
                       </Button>
                     </div>
@@ -250,102 +344,107 @@ export function PackageList() {
         </Card>
       )}
 
+      {/* Filter & Pagination Controls */}
+      {packages.length > 0 && (
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+          <div className="relative flex-1 max-w-xs">
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <input
+              type="text"
+              value={filterQuery}
+              onChange={(e) => handleFilterChange(e.target.value)}
+              placeholder={t('packages.filterPlaceholder')}
+              className="w-full pl-9 pr-4 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200"
+            />
+          </div>
+          <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+            <span>
+              {t('packages.showing', { start: startItem, end: endItem, total: filteredPackages.length })}
+            </span>
+            <Select
+              value={String(pageSize)}
+              onChange={handlePageSizeChange}
+              options={PAGE_SIZE_OPTIONS}
+              size="sm"
+              className="w-20"
+            />
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+              >
+                <ChevronLeft size={18} />
+              </Button>
+              <span className="px-2">
+                {page} / {totalPages || 1}
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+              >
+                <ChevronRight size={18} />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Package List */}
       <Card padding="none" className="overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center text-gray-500">{t('common.loading')}</div>
         ) : packages.length === 0 ? (
-          <EmptyState
-            icon={PackageIcon}
-            title={t('packages.noPackages')}
-            className="py-8"
-          />
+          <EmptyState icon={PackageIcon} title={t('packages.noPackages')} className="py-8" />
+        ) : filteredPackages.length === 0 ? (
+          <EmptyState icon={Search} title={t('packages.noMatch')} className="py-8" />
         ) : (
-          <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-700/50">
-              <tr>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  {t('packages.name')}
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  {t('packages.version')}
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-400">
-                  {t('packages.type')}
-                </th>
-                <th className="px-4 py-3 text-right text-sm font-medium text-gray-500 dark:text-gray-400">
-                  {t('packages.actions')}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {packages.map((pkg) => {
-                const updateStatus = updateMap.get(pkg.name);
-                return (
-                  <tr
-                    key={pkg.name}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700/30"
-                  >
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-800 dark:text-gray-200">
-                          {pkg.name}
-                        </span>
-                        {updateStatus?.deprecated && (
-                          <span
-                            className="flex items-center gap-1 px-1.5 py-0.5 text-xs bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 rounded"
-                            title={updateStatus.deprecated}
-                          >
-                            <AlertTriangle size={10} />
-                            废弃
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-gray-600 dark:text-gray-400">{pkg.version}</span>
-                      {updateStatus?.hasUpdate && (
-                        <span className="ml-2 text-xs text-primary-500 flex items-center gap-1 inline-flex">
-                          <ArrowUp size={10} />
-                          {updateStatus.latestVersion}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge
-                        variant={pkg.isDev ? 'warning' : 'success'}
-                        size="sm"
-                      >
-                        {pkg.isDev ? t('common.dev') : t('common.prod')}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        {updateStatus?.hasUpdate && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleUpdate(pkg.name)}
-                            loading={updateMutation.isPending}
-                            title={t('common.update')}
-                          >
-                            <ArrowUp size={16} className="text-primary-500" />
-                          </Button>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleUninstall(pkg.name)}
-                          disabled={uninstallMutation.isPending}
-                        >
-                          <Trash2 size={16} className="text-red-500" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <>
+            {/* Table Header */}
+            <div className="flex items-center px-4 py-3 bg-gray-50 dark:bg-gray-700/50 text-sm font-medium text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex-1">{t('packages.name')}</div>
+              <div className="w-32">{t('packages.version')}</div>
+              <div className="w-20">{t('packages.type')}</div>
+              <div className="w-24 text-right">{t('packages.actions')}</div>
+            </div>
+
+            {/* Virtual List */}
+            <div
+              ref={parentRef}
+              className="overflow-auto"
+              style={{ height: Math.min(paginatedPackages.length * ROW_HEIGHT, 400) }}
+            >
+              <div
+                style={{
+                  height: `${virtualizer.getTotalSize()}px`,
+                  width: '100%',
+                  position: 'relative',
+                }}
+              >
+                {virtualizer.getVirtualItems().map((virtualRow) => {
+                  const pkg = paginatedPackages[virtualRow.index];
+                  return (
+                    <div
+                      key={pkg.name}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: `${virtualRow.size}px`,
+                        transform: `translateY(${virtualRow.start}px)`,
+                      }}
+                    >
+                      {renderRow(pkg)}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
         )}
       </Card>
 

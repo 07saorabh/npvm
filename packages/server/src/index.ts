@@ -88,7 +88,7 @@ export async function createServer(options: ServerOptions = {}) {
     isGlobal: !isProject,
   };
 
-  console.log(`📦 Mode: ${state.isGlobal ? 'Global' : 'Project'} (${absoluteProjectPath})`);
+  console.warn(`📦 Mode: ${state.isGlobal ? 'Global' : 'Project'} (${absoluteProjectPath})`);
 
   // 注册 API 路由
   await registerRoutes(app, state);
@@ -123,7 +123,7 @@ export async function startServer(options: ServerOptions = {}) {
 
   try {
     await app.listen({ port, host });
-    console.log(`\n🚀 NPVM Server running at http://${host}:${port}\n`);
+    console.warn(`\n🚀 NPVM Server running at http://${host}:${port}\n`);
     return app;
   } catch (err) {
     app.log.error(err);

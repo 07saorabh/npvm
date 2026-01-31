@@ -5,6 +5,7 @@ import { Packages } from './pages/Packages';
 import { Dependencies } from './pages/Dependencies';
 import { Security } from './pages/Security';
 import { Settings } from './pages/Settings';
+import { NotFound } from './pages/NotFound';
 import { RemoteAnalysis } from './pages/RemoteAnalysis';
 import { Docs } from './pages/Docs';
 import { Changelog } from './pages/Changelog';
@@ -32,6 +33,7 @@ export default function App() {
             <Route path="guide" element={<Docs />} />
             <Route path="changelog" element={<Changelog />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
       </BrowserRouter>

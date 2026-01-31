@@ -46,15 +46,36 @@ export interface VulnerabilityInfo {
   url?: string;
 }
 
+export interface AuditSummary {
+  critical: number;
+  high: number;
+  moderate: number;
+  low: number;
+  total: number;
+}
+
 export interface AuditResult {
   vulnerabilities: VulnerabilityInfo[];
-  summary: {
-    critical: number;
-    high: number;
-    moderate: number;
-    low: number;
-    total: number;
-  };
+  summary: AuditSummary;
+}
+
+export interface AuditMetadata {
+  projectPath: string;
+  packageManager: PackageManagerType;
+  scannedAt: number;
+  duration: number;
+  totalPackages: number;
+}
+
+export interface AuditReport {
+  metadata: AuditMetadata;
+  result: AuditResult;
+}
+
+export interface AuditFixResult {
+  fixed: number;
+  remaining: AuditResult;
+  logs: string[];
 }
 
 export interface RegistryConfig {
@@ -125,4 +146,77 @@ export interface RemoteAnalysisResult {
   vulnerabilities: VulnerabilityInfo[];
   updates: RemoteUpdateInfo[];
   lockFileType?: 'npm' | 'yarn' | 'pnpm';
+}
+
+// ============ 内部解析类型（用于替代 any） ============
+
+/** 依赖信息通用结构 */
+export interface DependencyInfo {
+  version?: string;
+  resolved?: string;
+  dependencies?: Record<string, DependencyInfo>;
+}
+
+/** npm audit v7+ 漏洞项 */
+export interface NpmAuditVulnerability {
+  severity: string;
+  range?: string;
+  fixAvailable?: { name: string; version: string } | boolean;
+  via: Array<string | { title?: string; source?: number; cve?: string; url?: string }>;
+}
+
+/** npm audit v6 advisory */
+export interface NpmAuditAdvisory {
+  id?: number;
+  title?: string;
+  severity?: string;
+  module_name?: string;
+  vulnerable_versions?: string;
+  recommendation?: string;
+  url?: string;
+}
+
+/** yarn audit advisory */
+export interface YarnAuditAdvisory {
+  id?: number;
+  title?: string;
+  severity?: string;
+  module_name?: string;
+  vulnerable_versions?: string;
+  recommendation?: string;
+  url?: string;
+}
+
+/** npm lock 文件包条目 */
+export interface NpmLockPackageEntry {
+  version?: string;
+  resolved?: string;
+  integrity?: string;
+  dependencies?: Record<string, string>;
+}
+
+/** npm 搜索结果对象 */
+export interface NpmSearchObject {
+  package: {
+    name: string;
+    description?: string;
+    version: string;
+  };
+}
+
+/** yarn tree 子节点 */
+export interface YarnTreeChild {
+  name?: string;
+  children?: YarnTreeChild[];
+}
+
+/** yarn list 数据结构 */
+export interface YarnTreeData {
+  trees?: YarnTreeChild[];
+}
+
+/** OSV 漏洞事件 */
+export interface OsvVulnEvent {
+  introduced?: string;
+  fixed?: string;
 }
