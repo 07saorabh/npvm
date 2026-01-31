@@ -13,7 +13,12 @@
     "dev": "开发",
     "prod": "生产",
     "active": "当前",
-    "clear": "清空"
+    "clear": "清空",
+    "recentProjects": "最近项目",
+    "justNow": "刚刚",
+    "minutesAgo": "{{count}} 分钟前",
+    "hoursAgo": "{{count}} 小时前",
+    "daysAgo": "{{count}} 天前"
   },
   "nav": {
     "dashboard": "仪表盘",

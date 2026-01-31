@@ -11,10 +11,15 @@ interface AuditHistoryItem {
   timestamp: number;
 }
 
+interface ProjectPathHistoryItem {
+  path: string;
+  timestamp: number;
+}
+
 interface AppState {
   currentPm: PackageManagerType;
   projectPath: string;
-  projectPathHistory: string[];
+  projectPathHistory: ProjectPathHistoryItem[];
   currentRegistry: string;
   isDarkMode: boolean;
   themeMode: ThemeMode;
@@ -30,6 +35,7 @@ interface AppState {
   setProjectPath: (path: string) => void;
   addProjectPathToHistory: (path: string) => void;
   removeProjectPathFromHistory: (path: string) => void;
+  clearProjectPathHistory: () => void;
   setCurrentRegistry: (url: string) => void;
   toggleDarkMode: () => void;
   setThemeMode: (mode: ThemeMode) => void;
@@ -83,14 +89,16 @@ export const useAppStore = create<AppState>()(
       addProjectPathToHistory: (path) => {
         if (!path || path === '.') return;
         set((state) => {
-          const filtered = state.projectPathHistory.filter((p) => p !== path);
-          return { projectPathHistory: [path, ...filtered].slice(0, 10) };
+          const filtered = state.projectPathHistory.filter((p) => p.path !== path);
+          const newItem: ProjectPathHistoryItem = { path, timestamp: Date.now() };
+          return { projectPathHistory: [newItem, ...filtered].slice(0, 20) };
         });
       },
       removeProjectPathFromHistory: (path) =>
         set((state) => ({
-          projectPathHistory: state.projectPathHistory.filter((p) => p !== path),
+          projectPathHistory: state.projectPathHistory.filter((p) => p.path !== path),
         })),
+      clearProjectPathHistory: () => set({ projectPathHistory: [] }),
       setCurrentRegistry: (url) => set({ currentRegistry: url }),
       toggleDarkMode: () =>
         set((state) => {

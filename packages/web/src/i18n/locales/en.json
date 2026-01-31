@@ -13,7 +13,12 @@
     "dev": "Dev",
     "prod": "Prod",
     "active": "Active",
-    "clear": "Clear"
+    "clear": "Clear",
+    "recentProjects": "Recent Projects",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}} min ago",
+    "hoursAgo": "{{count}} hr ago",
+    "daysAgo": "{{count}} days ago"
   },
   "nav": {
     "dashboard": "Dashboard",

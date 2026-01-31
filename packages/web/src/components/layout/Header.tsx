@@ -1,4 +1,4 @@
-import { Moon, Sun, FolderOpen, Languages, Menu, ChevronDown, X, Globe } from 'lucide-react';
+import { Moon, Sun, FolderOpen, Languages, Menu, ChevronDown, X, Globe, Clock, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAppStore } from '../../stores/app';
@@ -18,6 +18,19 @@ function truncatePath(path: string, maxLen = 30): string {
   return '.../' + parts.slice(-2).join('/');
 }
 
+function formatRelativeTime(timestamp: number, t: (key: string, options?: Record<string, unknown>) => string): string {
+  const now = Date.now();
+  const diff = now - timestamp;
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+
+  if (minutes < 1) return t('common.justNow');
+  if (minutes < 60) return t('common.minutesAgo', { count: minutes });
+  if (hours < 24) return t('common.hoursAgo', { count: hours });
+  return t('common.daysAgo', { count: days });
+}
+
 export function Header() {
   const { t, i18n } = useTranslation();
   const {
@@ -29,6 +42,7 @@ export function Header() {
     setProjectPath,
     projectPathHistory,
     removeProjectPathFromHistory,
+    clearProjectPathHistory,
     isGlobal,
     setIsGlobal,
     setMobileMenuOpen,
@@ -136,7 +150,7 @@ export function Header() {
           </button>
 
           {showPathDropdown && (
-            <div className="absolute left-0 top-full mt-1 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
+            <div className="absolute left-0 top-full mt-1 w-96 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
               {/* 全局模式选项 */}
               <button
                 onClick={handleSwitchToGlobal}
@@ -151,45 +165,65 @@ export function Header() {
                 {isGlobal && <span className="ml-auto text-xs text-primary-500">✓</span>}
               </button>
 
-              {/* 分隔线 */}
+              {/* 分隔线和标题 */}
               {projectPathHistory.length > 0 && (
-                <div className="border-t border-gray-200 dark:border-gray-700" />
+                <>
+                  <div className="border-t border-gray-200 dark:border-gray-700" />
+                  <div className="flex items-center justify-between px-3 py-1.5">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                      {t('common.recentProjects')}
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        clearProjectPathHistory();
+                      }}
+                      className="flex items-center gap-1 text-xs text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 size={12} />
+                      {t('common.clear')}
+                    </button>
+                  </div>
+                </>
               )}
 
               {/* 历史路径 */}
               {projectPathHistory.length > 0 && (
-                <div className="max-h-60 overflow-y-auto">
-                  <div className="px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400 font-medium">
-                    {t('settings.projectPath')}
-                  </div>
-                  {projectPathHistory.map((path) => (
+                <div className="max-h-72 overflow-y-auto">
+                  {projectPathHistory.map((item) => (
                     <div
-                      key={path}
+                      key={item.path}
                       className={clsx(
-                        'group flex items-center gap-2 px-4 py-2 text-sm',
+                        'group flex items-center gap-2 px-4 py-2.5 text-sm',
                         'hover:bg-gray-100 dark:hover:bg-gray-700',
-                        !isGlobal && projectPath === path && 'bg-primary-50 dark:bg-primary-900/20'
+                        !isGlobal && projectPath === item.path && 'bg-primary-50 dark:bg-primary-900/20'
                       )}
                     >
                       <button
-                        onClick={() => handleSelectPath(path)}
-                        className="flex-1 flex items-center gap-2 text-left min-w-0"
+                        onClick={() => handleSelectPath(item.path)}
+                        className="flex-1 flex flex-col gap-0.5 text-left min-w-0"
                       >
-                        <FolderOpen size={14} className="flex-shrink-0 text-gray-400" />
-                        <span
-                          className="truncate font-mono text-gray-700 dark:text-gray-200"
-                          title={path}
-                        >
-                          {truncatePath(path, 40)}
-                        </span>
-                        {!isGlobal && projectPath === path && (
-                          <span className="ml-auto text-xs text-primary-500">✓</span>
-                        )}
+                        <div className="flex items-center gap-2">
+                          <FolderOpen size={14} className="flex-shrink-0 text-gray-400" />
+                          <span
+                            className="truncate font-mono text-gray-700 dark:text-gray-200"
+                            title={item.path}
+                          >
+                            {truncatePath(item.path, 45)}
+                          </span>
+                          {!isGlobal && projectPath === item.path && (
+                            <span className="text-xs text-primary-500">✓</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 ml-5 text-xs text-gray-400">
+                          <Clock size={10} />
+                          <span>{formatRelativeTime(item.timestamp, t)}</span>
+                        </div>
                       </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          removeProjectPathFromHistory(path);
+                          removeProjectPathFromHistory(item.path);
                         }}
                         className="p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                       >
