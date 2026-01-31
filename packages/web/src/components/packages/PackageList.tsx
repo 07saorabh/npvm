@@ -62,7 +62,7 @@ export function PackageList() {
   const toggleMode = async () => {
     const newIsGlobal = !isGlobal;
     setIsGlobal(newIsGlobal);
-    await fetch('http://localhost:3456/api/global/status', {
+    await fetch('/api/global/status', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ isGlobal: newIsGlobal }),
