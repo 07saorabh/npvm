@@ -10,6 +10,7 @@ import {
   useCheckUpdates,
 } from '../../hooks/usePackages';
 import { useAppStore } from '../../stores/app';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { clsx } from 'clsx';
 
 export function PackageList() {
@@ -18,6 +19,11 @@ export function PackageList() {
   const [showSearch, setShowSearch] = useState(false);
   const [manualInput, setManualInput] = useState('');
   const [installAsDev, setInstallAsDev] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    type: 'uninstall' | 'updateAll';
+    packageName?: string;
+  }>({ open: false, type: 'uninstall' });
   const { data: packages = [], isLoading, refetch } = useInstalledPackages();
   const { data: searchResults = [] } = useSearchPackages(searchQuery);
   const installMutation = useInstallPackage();
@@ -60,9 +66,14 @@ export function PackageList() {
   };
 
   const handleUninstall = async (name: string) => {
-    if (confirm(t('packages.confirmUninstall', { name }))) {
-      await uninstallMutation.mutateAsync([name]);
+    setConfirmDialog({ open: true, type: 'uninstall', packageName: name });
+  };
+
+  const confirmUninstall = async () => {
+    if (confirmDialog.packageName) {
+      await uninstallMutation.mutateAsync([confirmDialog.packageName]);
     }
+    setConfirmDialog({ open: false, type: 'uninstall' });
   };
 
   const handleUpdate = async (name: string) => {
@@ -85,9 +96,12 @@ export function PackageList() {
 
   const handleUpdateAll = async () => {
     if (updatablePackages.length === 0) return;
-    if (confirm(t('packages.confirmUpdateAll', { count: updatablePackages.length }))) {
-      await updateMutation.mutateAsync(updatablePackages);
-    }
+    setConfirmDialog({ open: true, type: 'updateAll' });
+  };
+
+  const confirmUpdateAll = async () => {
+    await updateMutation.mutateAsync(updatablePackages);
+    setConfirmDialog({ open: false, type: 'updateAll' });
   };
 
   return (
@@ -333,6 +347,25 @@ export function PackageList() {
           </table>
         )}
       </div>
+
+      <ConfirmDialog
+        open={confirmDialog.open && confirmDialog.type === 'uninstall'}
+        title={t('packages.confirmUninstall', { name: confirmDialog.packageName })}
+        variant="destructive"
+        confirmText={t('common.uninstall')}
+        cancelText={t('common.cancel')}
+        onConfirm={confirmUninstall}
+        onCancel={() => setConfirmDialog({ open: false, type: 'uninstall' })}
+      />
+
+      <ConfirmDialog
+        open={confirmDialog.open && confirmDialog.type === 'updateAll'}
+        title={t('packages.confirmUpdateAll', { count: updatablePackages.length })}
+        confirmText={t('common.update')}
+        cancelText={t('common.cancel')}
+        onConfirm={confirmUpdateAll}
+        onCancel={() => setConfirmDialog({ open: false, type: 'updateAll' })}
+      />
     </div>
   );
 }
