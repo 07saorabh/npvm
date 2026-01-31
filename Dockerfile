@@ -3,6 +3,10 @@
 # ================================
 FROM node:20-alpine AS builder
 
+# 设置 PNPM 环境
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 WORKDIR /app
@@ -14,11 +18,8 @@ COPY packages/server/package.json ./packages/server/
 COPY packages/web/package.json ./packages/web/
 COPY packages/cli/package.json ./packages/cli/
 
-# 安装依赖（包括 devDependencies 用于构建）
+# 安装所有依赖（包括 devDependencies）
 RUN pnpm install --frozen-lockfile
-
-# 确保 turbo 可用（某些环境可能需要显式安装）
-RUN pnpm add -g turbo
 
 # 复制源代码
 COPY packages ./packages
@@ -26,8 +27,8 @@ COPY packages ./packages
 # 复制脚本目录
 COPY script ./script
 
-# 构建
-RUN pnpm build
+# 使用 npx 运行 turbo 构建（避免全局安装问题）
+RUN npx turbo build
 
 # ================================
 # Stage 2: Production
