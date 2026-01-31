@@ -1,5 +1,6 @@
 import { forwardRef } from 'react';
 import { clsx } from 'clsx';
+import { X } from 'lucide-react';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -7,11 +8,24 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   hint?: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  clearable?: boolean;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, hint, leftIcon, rightIcon, id, ...props }, ref) => {
+  ({ className, label, error, hint, leftIcon, rightIcon, clearable, id, onChange, value, ...props }, ref) => {
     const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
+    const hasValue = value !== undefined && value !== '';
+    const showClearButton = clearable && hasValue && !props.disabled;
+
+    const handleClear = () => {
+      if (onChange) {
+        const syntheticEvent = {
+          target: { value: '' },
+          currentTarget: { value: '' },
+        } as React.ChangeEvent<HTMLInputElement>;
+        onChange(syntheticEvent);
+      }
+    };
 
     return (
       <div className="space-y-1.5">
@@ -32,6 +46,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             id={inputId}
+            value={value}
+            onChange={onChange}
             className={clsx(
               'w-full rounded-lg border bg-white dark:bg-gray-800',
               'text-gray-900 dark:text-gray-100',
@@ -40,7 +56,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               'focus:outline-none focus:ring-2 focus:ring-offset-0',
               // 尺寸与图标间距
               leftIcon ? 'pl-10' : 'pl-4',
-              rightIcon ? 'pr-10' : 'pr-4',
+              rightIcon || showClearButton ? 'pr-10' : 'pr-4',
               'py-2',
               // 状态
               error
@@ -53,7 +69,25 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             aria-describedby={error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined}
             {...props}
           />
-          {rightIcon && (
+          {showClearButton && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className={clsx(
+                'absolute right-3 top-1/2 -translate-y-1/2',
+                'p-0.5 rounded-full',
+                'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300',
+                'hover:bg-gray-100 dark:hover:bg-gray-700',
+                'active:scale-90',
+                'transition-all duration-150',
+                'focus:outline-none focus:ring-2 focus:ring-primary-500/20'
+              )}
+              aria-label="清空输入"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+          {rightIcon && !showClearButton && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
               {rightIcon}
             </div>

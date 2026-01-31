@@ -1,21 +1,33 @@
 import { useTranslation } from 'react-i18next';
 import { ExternalLink } from 'lucide-react';
 
+// 部署平台演示链接
+const DEMO_LINKS = [
+  { name: 'Zeabur', url: 'https://npvm.zeabur.app', icon: '🚀' },
+  { name: 'Vercel', url: 'https://npvm.vercel.app', icon: '▲' },
+  { name: 'Cloudflare', url: 'https://npvm.pages.dev', icon: '☁️' },
+  { name: 'Netlify', url: 'https://npvm.netlify.app', icon: '🌐' },
+  { name: 'Deno', url: 'https://website.npvm.deno.net', icon: '🦕' },
+  { name: 'Surge', url: 'https://npvm.surge.sh', icon: '⚡' },
+  { name: 'Render', url: 'https://npvm.onrender.com', icon: '🎨' },
+  { name: 'Railway', url: 'https://npvm.up.railway.app', icon: '🚂' },
+];
+
 export function Footer() {
   const { t } = useTranslation();
 
-  const links = [
+  const mainLinks = [
     { href: 'https://github.com/h7ml/NPVM', label: 'GitHub', icon: '⭐' },
     { href: 'https://www.npmjs.com/package/@dext7r/npvm-cli', label: 'npm', icon: '📦' },
-    { href: 'https://npvm.zeabur.app', label: t('docs.liveDemo'), icon: '🚀' },
     { href: '/docs', label: 'Swagger API', icon: '📖' },
   ];
 
   return (
     <footer className="mt-8 mb-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+        {/* 主要链接 */}
         <div className="flex flex-wrap items-center justify-center gap-4">
-          {links.map(({ href, label, icon }) => (
+          {mainLinks.map(({ href, label, icon }) => (
             <a
               key={href}
               href={href}
@@ -29,6 +41,29 @@ export function Footer() {
             </a>
           ))}
         </div>
+
+        {/* 演示平台链接 */}
+        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+          <div className="text-center text-xs text-gray-500 dark:text-gray-400 mb-2">
+            {t('docs.liveDemo')}
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {DEMO_LINKS.map(({ name, url, icon }) => (
+              <a
+                key={name}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 px-2 py-1 rounded text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-600 dark:text-gray-400"
+                title={`${name} Demo`}
+              >
+                <span>{icon}</span>
+                <span>{name}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+
         <div className="mt-3 text-center text-xs text-gray-500 dark:text-gray-400">
           <span>{t('docs.builtWith')} </span>
           <a href="https://github.com/h7ml" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:underline">

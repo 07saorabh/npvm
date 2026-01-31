@@ -37,6 +37,7 @@ export default {
         'scale-in': 'scaleIn 0.2s ease-out',
         'spin-slow': 'spin 2s linear infinite',
         'pulse-subtle': 'pulseSubtle 2s ease-in-out infinite',
+        'pulse-badge': 'pulseBadge 1.5s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -62,6 +63,14 @@ export default {
         pulseSubtle: {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.7' },
+        },
+        pulseBadge: {
+          '0%, 100%': { transform: 'scale(1)', boxShadow: '0 0 0 0 currentColor' },
+          '50%': { transform: 'scale(1.05)', boxShadow: '0 0 8px 2px currentColor' },
+        },
+        barPulse: {
+          '0%, 100%': { transform: 'scaleY(0.4)', opacity: '0.5' },
+          '50%': { transform: 'scaleY(1)', opacity: '1' },
         },
       },
       backdropBlur: {

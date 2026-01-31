@@ -32,3 +32,9 @@ export type { TabsProps, TabsListProps, TabsTriggerProps, TabsContentProps } fro
 
 export { Skeleton, SkeletonText, SkeletonAvatar, SkeletonCard, SkeletonTable } from './Skeleton';
 export type { SkeletonProps, SkeletonTextProps, SkeletonAvatarProps, SkeletonCardProps, SkeletonTableProps } from './Skeleton';
+
+export { PackageMetaCard } from './PackageMetaCard';
+export type { PackageMetaCardProps } from './PackageMetaCard';
+
+export { RepoInfoCard } from './RepoInfoCard';
+export type { RepoInfoCardProps } from './RepoInfoCard';

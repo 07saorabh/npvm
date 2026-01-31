@@ -1,6 +1,6 @@
 import { forwardRef, useState, useRef, useEffect, useCallback, useImperativeHandle } from 'react';
 import { clsx } from 'clsx';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown, Check, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
 export interface SelectOption {
@@ -18,10 +18,11 @@ export interface SelectProps {
   disabled?: boolean;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
+  clearable?: boolean;
 }
 
 export const Select = forwardRef<HTMLButtonElement, SelectProps>(
-  ({ value, onChange, options, placeholder = 'Select...', disabled, className, size = 'md' }, ref) => {
+  ({ value, onChange, options, placeholder = 'Select...', disabled, className, size = 'md', clearable }, ref) => {
     const [isOpen, setIsOpen] = useState(false);
     const [highlightedIndex, setHighlightedIndex] = useState(-1);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -147,10 +148,25 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
             {selectedOption?.icon}
             {selectedOption?.label || placeholder}
           </span>
-          <ChevronDown
-            size={size === 'sm' ? 14 : size === 'lg' ? 18 : 16}
-            className={clsx('transition-transform flex-shrink-0', isOpen && 'rotate-180')}
-          />
+          <span className="flex items-center gap-1 flex-shrink-0">
+            {clearable && value && !disabled && (
+              <span
+                role="button"
+                tabIndex={-1}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onChange('');
+                }}
+                className="p-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors active:scale-90"
+              >
+                <X size={size === 'sm' ? 12 : size === 'lg' ? 16 : 14} />
+              </span>
+            )}
+            <ChevronDown
+              size={size === 'sm' ? 14 : size === 'lg' ? 18 : 16}
+              className={clsx('transition-transform', isOpen && 'rotate-180')}
+            />
+          </span>
         </button>
 
         {isOpen &&

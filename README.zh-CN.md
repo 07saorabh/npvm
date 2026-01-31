@@ -80,7 +80,7 @@ docker run -p 3456:3456 npvm
 
 ### 部署到 Zeabur
 
-[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/templates/npvm)
+[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/)
 
 或手动部署：
 1. Fork 本仓库

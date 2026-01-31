@@ -15,6 +15,13 @@ export interface PackageInfo {
   repository?: string;
   license?: string;
   author?: string;
+  keywords?: string[];
+  maintainers?: { name: string; email?: string }[];
+  time?: { created?: string; modified?: string };
+  downloads?: { weekly?: number; monthly?: number };
+  engines?: Record<string, string>;
+  bugs?: string;
+  readme?: string;
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;

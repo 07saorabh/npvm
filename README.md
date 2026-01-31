@@ -16,7 +16,7 @@
 
 **[Live Demo](https://npvm.zeabur.app)** | **[API Docs](https://npvm.zeabur.app/docs)**
 
-[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/templates/NPVM)
+[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/)
 
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 
@@ -86,7 +86,7 @@ docker run -p 3456:3456 npvm
 
 ### Deploy to Zeabur
 
-[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/templates/npvm)
+[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/)
 
 Or deploy manually:
 1. Fork this repository

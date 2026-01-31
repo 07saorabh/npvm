@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AlertTriangle, X } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -14,6 +14,8 @@ interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
+const ANIMATION_DURATION = 200;
+
 export function ConfirmDialog({
   open,
   title,
@@ -25,7 +27,39 @@ export function ConfirmDialog({
   onCancel,
 }: ConfirmDialogProps) {
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
+  const [shouldRender, setShouldRender] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
+  // 处理打开
+  useEffect(() => {
+    if (open) {
+      setShouldRender(true);
+    }
+  }, [open]);
+
+  // 处理动画
+  useEffect(() => {
+    if (!shouldRender) return;
+
+    if (open) {
+      // 打开动画
+      const rafId = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsAnimating(true);
+        });
+      });
+      return () => cancelAnimationFrame(rafId);
+    } else {
+      // 关闭动画
+      setIsAnimating(false);
+      const timer = setTimeout(() => {
+        setShouldRender(false);
+      }, ANIMATION_DURATION);
+      return () => clearTimeout(timer);
+    }
+  }, [open, shouldRender]);
+
+  // 键盘和焦点处理
   useEffect(() => {
     if (open) {
       confirmButtonRef.current?.focus();
@@ -41,7 +75,7 @@ export function ConfirmDialog({
     }
   }, [open, onCancel]);
 
-  if (!open) return null;
+  if (!shouldRender) return null;
 
   return createPortal(
     <div
@@ -52,12 +86,22 @@ export function ConfirmDialog({
     >
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+        className={clsx(
+          'absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity',
+          isAnimating ? 'opacity-100' : 'opacity-0'
+        )}
+        style={{ transitionDuration: `${ANIMATION_DURATION}ms` }}
         onClick={onCancel}
       />
 
       {/* Dialog */}
-      <div className="relative z-10 w-full max-w-md mx-4 bg-white dark:bg-gray-800 rounded-xl shadow-2xl animate-in zoom-in-95 fade-in duration-200">
+      <div
+        className={clsx(
+          'relative z-10 w-full max-w-md mx-4 bg-white dark:bg-gray-800 rounded-xl shadow-2xl transition-all',
+          isAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+        )}
+        style={{ transitionDuration: `${ANIMATION_DURATION}ms`, transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+      >
         <div className="p-6">
           <div className="flex items-start gap-4">
             {variant === 'destructive' && (

@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import {
@@ -30,6 +30,8 @@ import {
 import { useAppStore } from '../../stores/app';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { Card, Button, Badge, EmptyState, Select } from '../ui';
+import { PackageJsonImporter } from './PackageJsonImporter';
+import { PackageDetailModal } from './PackageDetailModal';
 import { clsx } from 'clsx';
 import type { InstalledPackage } from '@dext7r/npvm-shared';
 
@@ -67,10 +69,14 @@ export function PackageList() {
     type: 'uninstall' | 'updateAll';
     packageName?: string;
   }>({ open: false, type: 'uninstall' });
+  const [clickedRow, setClickedRow] = useState<string | null>(null);
+  const [animatingPackages, setAnimatingPackages] = useState<Set<string>>(new Set());
+  const [selectedPackage, setSelectedPackage] = useState<{ name: string; version: string; isDev: boolean } | null>(null);
+  const prevPackagesRef = useRef<string[]>([]);
 
   const parentRef = useRef<HTMLDivElement>(null);
 
-  const { data: packages = [], isLoading, refetch } = useInstalledPackages();
+  const { data: packages = [], isLoading, isFetching, refetch } = useInstalledPackages();
   const { data: searchResults = [] } = useSearchPackages(npmSearchQuery);
   const installMutation = useInstallPackage();
   const uninstallMutation = useUninstallPackage();
@@ -94,6 +100,35 @@ export function PackageList() {
     });
     return map;
   }, [updateInfo]);
+
+  // 检测包列表变化，触发动画
+  useEffect(() => {
+    const currentNames = packages.map((p) => p.name);
+    const prevNames = prevPackagesRef.current;
+
+    if (prevNames.length > 0) {
+      // 新增的包
+      const added = currentNames.filter((name) => !prevNames.includes(name));
+      // 删除的包（已从列表移除，无需动画）
+      // 更新的包（版本变化检测可在此扩展）
+
+      if (added.length > 0) {
+        setAnimatingPackages(new Set(added));
+        // 动画结束后清除状态
+        const timer = setTimeout(() => setAnimatingPackages(new Set()), 500);
+        return () => clearTimeout(timer);
+      }
+    }
+
+    prevPackagesRef.current = currentNames;
+  }, [packages]);
+
+  // 行点击效果 - 打开包详情
+  const handleRowClick = (pkg: InstalledPackage) => {
+    setClickedRow(pkg.name);
+    setTimeout(() => setClickedRow(null), 150);
+    setSelectedPackage({ name: pkg.name, version: pkg.version, isDev: pkg.isDev });
+  };
 
   // 本地过滤
   const filteredPackages = useMemo(() => {
@@ -185,6 +220,21 @@ export function PackageList() {
     setShowSearch(false);
   };
 
+  // 从 package.json 导入安装
+  const handleImportInstall = async (packages: { name: string; version: string; isDev: boolean }[]) => {
+    if (packages.length === 0) return;
+    // 分组：生产依赖和开发依赖
+    const prodPkgs = packages.filter((p) => !p.isDev).map((p) => `${p.name}@${p.version}`);
+    const devPkgs = packages.filter((p) => p.isDev).map((p) => `${p.name}@${p.version}`);
+    // 依次安装
+    if (prodPkgs.length > 0) {
+      await installMutation.mutateAsync({ packages: prodPkgs, dev: false });
+    }
+    if (devPkgs.length > 0) {
+      await installMutation.mutateAsync({ packages: devPkgs, dev: true });
+    }
+  };
+
   const handleUninstall = async (name: string) => {
     setConfirmDialog({ open: true, type: 'uninstall', packageName: name });
   };
@@ -225,8 +275,23 @@ export function PackageList() {
 
   const renderRow = (pkg: InstalledPackage) => {
     const updateStatus = updateMap.get(pkg.name);
+    const isAnimating = animatingPackages.has(pkg.name);
+    const isClicked = clickedRow === pkg.name;
+
     return (
-      <div className="flex items-center px-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
+      <div
+        onClick={() => handleRowClick(pkg)}
+        className={clsx(
+          'flex items-center px-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0 cursor-pointer select-none',
+          // hover 效果
+          'transition-all duration-150 ease-in-out',
+          'hover:bg-gray-100/70 dark:hover:bg-gray-700/50',
+          // 点击效果
+          isClicked && 'bg-gray-200/80 dark:bg-gray-600/50 scale-[0.995]',
+          // 新增动画
+          isAnimating && 'animate-fade-in bg-green-50 dark:bg-green-900/20'
+        )}
+      >
         <div className="flex-1 min-w-0 py-3">
           <div className="flex items-center gap-2">
             <span className="font-medium text-gray-800 dark:text-gray-200 truncate">
@@ -262,7 +327,10 @@ export function PackageList() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleUpdate(pkg.name)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleUpdate(pkg.name);
+              }}
               loading={updateMutation.isPending}
               title={t('common.update')}
             >
@@ -272,7 +340,10 @@ export function PackageList() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => handleUninstall(pkg.name)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleUninstall(pkg.name);
+            }}
             disabled={uninstallMutation.isPending}
           >
             <Trash2 size={16} className="text-red-500" />
@@ -319,8 +390,8 @@ export function PackageList() {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => refetch()}>
-            <RefreshCw size={18} />
+          <Button variant="ghost" size="icon" onClick={() => refetch()} disabled={isFetching}>
+            <RefreshCw size={18} className={isFetching ? 'animate-spin' : ''} />
           </Button>
           <Button onClick={() => setShowSearch(!showSearch)} leftIcon={<Plus size={18} />}>
             {t('packages.addPackage')}
@@ -400,6 +471,12 @@ export function PackageList() {
           </div>
         </Card>
       )}
+
+      {/* Package JSON Importer */}
+      <PackageJsonImporter
+        onInstall={handleImportInstall}
+        isInstalling={installMutation.isPending}
+      />
 
       {/* Filter & Pagination Controls */}
       {packages.length > 0 && (
@@ -540,6 +617,13 @@ export function PackageList() {
         cancelText={t('common.cancel')}
         onConfirm={confirmUpdateAll}
         onCancel={() => setConfirmDialog({ open: false, type: 'updateAll' })}
+      />
+
+      <PackageDetailModal
+        packageName={selectedPackage?.name || null}
+        currentVersion={selectedPackage?.version}
+        isDev={selectedPackage?.isDev}
+        onClose={() => setSelectedPackage(null)}
       />
     </div>
   );

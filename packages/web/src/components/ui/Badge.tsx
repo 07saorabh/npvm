@@ -4,6 +4,8 @@ export interface BadgeProps {
   variant?: 'default' | 'success' | 'warning' | 'error' | 'info' | 'outline';
   size?: 'sm' | 'md';
   dot?: boolean;
+  pulse?: boolean;
+  onClick?: () => void;
   children: React.ReactNode;
   className?: string;
 }
@@ -12,13 +14,18 @@ export function Badge({
   variant = 'default',
   size = 'sm',
   dot = false,
+  pulse = false,
+  onClick,
   children,
   className,
 }: BadgeProps) {
+  const isClickable = !!onClick;
+
   return (
     <span
+      onClick={onClick}
       className={clsx(
-        'inline-flex items-center font-medium rounded-full',
+        'inline-flex items-center font-medium rounded-full transition-all duration-200',
         // 尺寸
         size === 'sm' && 'px-2 py-0.5 text-xs',
         size === 'md' && 'px-2.5 py-1 text-sm',
@@ -29,6 +36,12 @@ export function Badge({
         variant === 'error' && 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
         variant === 'info' && 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
         variant === 'outline' && 'border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400',
+        // hover 效果
+        'hover:brightness-95 hover:scale-105',
+        // 可点击交互
+        isClickable && 'cursor-pointer active:scale-95',
+        // 脉冲动画
+        pulse && 'animate-pulse-badge',
         className
       )}
     >

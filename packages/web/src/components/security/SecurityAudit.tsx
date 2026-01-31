@@ -22,6 +22,7 @@ import {
 import { useSecurityAudit, useAuditFix } from '../../hooks/usePackages';
 import { useAppStore } from '../../stores/app';
 import { Card, Button, EmptyState, Select } from '../ui';
+import { PackageDetailModal } from '../packages/PackageDetailModal';
 import type { AuditReport, VulnerabilityInfo } from '@dext7r/npvm-shared';
 import { clsx } from 'clsx';
 
@@ -144,6 +145,7 @@ export function SecurityAudit() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState<{ name: string; version: string } | null>(null);
 
   const auditMutation = useSecurityAudit();
   const fixMutation = useAuditFix();
@@ -439,7 +441,14 @@ export function SecurityAudit() {
                           {vuln.title}
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                          Package: <span className="font-mono">{vuln.package}</span> ({vuln.version})
+                          Package:{' '}
+                          <span
+                            className="font-mono text-primary-500 hover:underline cursor-pointer"
+                            onClick={() => setSelectedPackage({ name: vuln.package, version: vuln.version })}
+                          >
+                            {vuln.package}
+                          </span>{' '}
+                          ({vuln.version})
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
                           {vuln.recommendation}
@@ -490,6 +499,12 @@ export function SecurityAudit() {
           />
         </Card>
       )}
+
+      <PackageDetailModal
+        packageName={selectedPackage?.name || null}
+        currentVersion={selectedPackage?.version}
+        onClose={() => setSelectedPackage(null)}
+      />
     </div>
   );
 }

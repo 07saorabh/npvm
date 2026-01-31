@@ -4,17 +4,37 @@ import type { DependencyNode } from '@dext7r/npvm-shared';
 import { ChevronRight, Package, GitBranch } from 'lucide-react';
 import { useState } from 'react';
 import { Card, EmptyState, Spinner, Badge } from '../ui';
+import { PackageDetailModal } from '../packages/PackageDetailModal';
 
-function TreeNode({ node, level = 0, t }: { node: DependencyNode; level?: number; t: (key: string) => string }) {
+interface TreeNodeProps {
+  node: DependencyNode;
+  level?: number;
+  t: (key: string) => string;
+  onPackageClick: (name: string, version: string) => void;
+}
+
+function TreeNode({ node, level = 0, t, onPackageClick }: TreeNodeProps) {
   const [isExpanded, setIsExpanded] = useState(level < 2);
   const hasChildren = node.children.length > 0;
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (hasChildren) {
+      setIsExpanded(!isExpanded);
+    }
+  };
+
+  const handlePackageClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onPackageClick(node.name, node.version);
+  };
 
   return (
     <div>
       <div
         className="flex items-center gap-2 py-1.5 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg cursor-pointer transition-colors group"
         style={{ paddingLeft: `${level * 20 + 8}px` }}
-        onClick={() => hasChildren && setIsExpanded(!isExpanded)}
+        onClick={handleClick}
       >
         {hasChildren ? (
           <span className="text-gray-400 transition-transform duration-200" style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>
@@ -24,7 +44,12 @@ function TreeNode({ node, level = 0, t }: { node: DependencyNode; level?: number
           <span className="w-4" />
         )}
         <Package size={14} className="text-primary-500" />
-        <span className="font-medium text-gray-800 dark:text-gray-200">{node.name}</span>
+        <span
+          className="font-medium text-gray-800 dark:text-gray-200 hover:text-primary-500 hover:underline"
+          onClick={handlePackageClick}
+        >
+          {node.name}
+        </span>
         <span className="text-sm text-gray-500 font-mono">@{node.version}</span>
         {node.isCircular && (
           <Badge variant="error" size="sm">{t('deps.circular')}</Badge>
@@ -38,7 +63,7 @@ function TreeNode({ node, level = 0, t }: { node: DependencyNode; level?: number
       {isExpanded &&
         hasChildren &&
         node.children.map((child, i) => (
-          <TreeNode key={`${child.name}-${i}`} node={child} level={level + 1} t={t} />
+          <TreeNode key={`${child.name}-${i}`} node={child} level={level + 1} t={t} onPackageClick={onPackageClick} />
         ))}
     </div>
   );
@@ -47,6 +72,11 @@ function TreeNode({ node, level = 0, t }: { node: DependencyNode; level?: number
 export function DependencyTree() {
   const { t } = useTranslation();
   const { data: tree, isLoading } = useDependencyTree();
+  const [selectedPackage, setSelectedPackage] = useState<{ name: string; version: string } | null>(null);
+
+  const handlePackageClick = (name: string, version: string) => {
+    setSelectedPackage({ name, version });
+  };
 
   if (isLoading) {
     return (
@@ -69,8 +99,16 @@ export function DependencyTree() {
   }
 
   return (
-    <Card padding="sm" className="max-h-[600px] overflow-y-auto scrollbar-thin">
-      <TreeNode node={tree} t={t} />
-    </Card>
+    <>
+      <Card padding="sm" className="max-h-[600px] overflow-y-auto scrollbar-thin">
+        <TreeNode node={tree} t={t} onPackageClick={handlePackageClick} />
+      </Card>
+
+      <PackageDetailModal
+        packageName={selectedPackage?.name || null}
+        currentVersion={selectedPackage?.version}
+        onClose={() => setSelectedPackage(null)}
+      />
+    </>
   );
 }

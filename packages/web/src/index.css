@@ -68,12 +68,40 @@ body {
     animation: fadeIn 0.2s ease-out, scaleIn 0.2s ease-out;
   }
 
+  .animate-fade-in-up {
+    animation: fadeInUp 0.4s ease-out forwards;
+  }
+
+  .animate-float {
+    animation: float 2.5s ease-in-out infinite;
+  }
+
   .hover-lift {
     @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg;
   }
 
   .focus-ring {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
   }
 }
 
