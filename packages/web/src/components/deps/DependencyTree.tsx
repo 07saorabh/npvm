@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useDependencyTree } from '../../hooks/usePackages';
-import type { DependencyNode } from '@npvm/shared';
+import type { DependencyNode } from '@dext7r/npvm-shared';
 import { ChevronRight, ChevronDown, Package } from 'lucide-react';
 import { useState } from 'react';
 

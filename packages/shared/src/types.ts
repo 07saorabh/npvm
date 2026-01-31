@@ -80,3 +80,35 @@ export interface ApiResponse<T> {
   data?: T;
   error?: string;
 }
+
+// 远程仓库分析相关类型
+export type GitPlatform = 'github' | 'gitlab';
+
+export interface RemoteRepoInfo {
+  platform: GitPlatform;
+  owner: string;
+  repo: string;
+  branch?: string;
+}
+
+export interface RemotePackageInfo {
+  name: string;
+  version: string;
+  isDev: boolean;
+}
+
+export interface RemoteUpdateInfo {
+  name: string;
+  currentVersion: string;
+  latestVersion: string;
+  hasUpdate: boolean;
+}
+
+export interface RemoteAnalysisResult {
+  repoInfo: RemoteRepoInfo;
+  packages: RemotePackageInfo[];
+  dependencyTree: DependencyNode | null;
+  vulnerabilities: VulnerabilityInfo[];
+  updates: RemoteUpdateInfo[];
+  lockFileType?: 'npm' | 'yarn' | 'pnpm';
+}

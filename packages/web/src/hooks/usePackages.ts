@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
-import { fetchApi, createSSEConnection } from '../lib/api';
+import { fetchApi, createSSEConnection, analyzeRemoteRepo } from '../lib/api';
 import { useAppStore } from '../stores/app';
 import type {
   PackageManagerInfo,
@@ -8,7 +8,8 @@ import type {
   DependencyNode,
   AuditResult,
   OperationProgress,
-} from '@npvm/shared';
+  RemoteAnalysisResult,
+} from '@dext7r/npvm-shared';
 
 export interface PackageUpdateInfo {
   name: string;
@@ -227,5 +228,17 @@ export function useSearchPackages(query: string) {
       return res.data || [];
     },
     enabled: query.length > 1,
+  });
+}
+
+export function useRemoteAnalysis() {
+  return useMutation({
+    mutationFn: async ({ repoUrl, branch }: { repoUrl: string; branch?: string }) => {
+      const res = await analyzeRemoteRepo(repoUrl, branch);
+      if (!res.success || !res.data) {
+        throw new Error(res.error || 'Analysis failed');
+      }
+      return res.data as RemoteAnalysisResult;
+    },
   });
 }

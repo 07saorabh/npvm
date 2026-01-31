@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../stores/app';
-import { REGISTRIES } from '@npvm/shared';
+import { REGISTRIES } from '@dext7r/npvm-shared';
 import { fetchApi } from '../lib/api';
 
 export function Settings() {

@@ -5,7 +5,7 @@ import { useAppStore } from '../stores/app';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '../components/ui/Toast';
 import { useState } from 'react';
-import type { PackageManagerType } from '@npvm/shared';
+import type { PackageManagerType } from '@dext7r/npvm-shared';
 
 export function Dashboard() {
   const { t } = useTranslation();

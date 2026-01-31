@@ -1,7 +1,7 @@
 import { Moon, Sun, FolderOpen } from 'lucide-react';
 import { useAppStore } from '../../stores/app';
 import { usePackageManagers } from '../../hooks/usePackages';
-import type { PackageManagerType } from '@npvm/shared';
+import type { PackageManagerType } from '@dext7r/npvm-shared';
 
 export function Header() {
   const { isDarkMode, toggleDarkMode, currentPm, setCurrentPm, projectPath } = useAppStore();

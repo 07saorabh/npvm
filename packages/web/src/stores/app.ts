@@ -1,4 +1,4 @@
-import type { PackageManagerType, OperationProgress } from '@npvm/shared';
+import type { PackageManagerType, OperationProgress } from '@dext7r/npvm-shared';
 import { create } from 'zustand';
 
 interface AppState {

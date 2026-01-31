@@ -20,6 +20,7 @@
     "packages": "Packages",
     "dependencies": "Dependencies",
     "security": "Security",
+    "remote": "Remote",
     "settings": "Settings"
   },
   "dashboard": {
@@ -82,5 +83,24 @@
   "terminal": {
     "title": "Terminal",
     "noOutput": "No output yet..."
+  },
+  "remote": {
+    "title": "Remote Repository Analysis",
+    "urlPlaceholder": "Enter GitHub/GitLab repository URL...",
+    "branchPlaceholder": "Branch",
+    "analyze": "Analyze",
+    "analyzing": "Analyzing...",
+    "packages": "Packages",
+    "dependencyTree": "Dependency Tree",
+    "vulnerabilities": "Vulnerabilities",
+    "updates": "Updates Available",
+    "noLockFile": "No lock file found",
+    "noUpdates": "All packages are up to date",
+    "hint": "Enter a GitHub or GitLab repository URL to analyze its dependencies",
+    "error": "Failed to analyze repository",
+    "copyCommand": "Copy update command",
+    "copySuccess": "Copied!",
+    "commandCopied": "command copied to clipboard",
+    "copyFailed": "Copy failed"
   }
 }

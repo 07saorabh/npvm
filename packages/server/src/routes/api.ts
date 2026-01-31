@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { detectAllPackageManagers, getAdapter } from '../adapters/index.js';
-import type { PackageManagerType } from '@npvm/shared';
-import { REGISTRIES } from '@npvm/shared';
+import type { PackageManagerType } from '@dext7r/npvm-shared';
+import { REGISTRIES } from '@dext7r/npvm-shared';
 import {
   getPackageInfo,
   getPackageVersions,
@@ -9,6 +9,7 @@ import {
   checkRegistryConnection,
   checkPackagesUpdate,
 } from '../services/registry.js';
+import { analyzeRemoteRepo } from '../services/remote.js';
 import { routeSchemas } from './schemas.js';
 
 interface AppState {
@@ -293,6 +294,20 @@ export async function registerRoutes(app: FastifyInstance, state: AppState) {
     async (request) => {
       const updates = await checkPackagesUpdate(request.body.packages, state.currentRegistry);
       return { success: true, data: updates };
+    }
+  );
+
+  // 远程仓库分析
+  app.post<{ Body: { repoUrl: string; branch?: string } }>(
+    '/api/remote/analyze',
+    { schema: routeSchemas.analyzeRemoteRepo },
+    async (request) => {
+      try {
+        const result = await analyzeRemoteRepo(request.body.repoUrl, request.body.branch);
+        return { success: true, data: result };
+      } catch (error) {
+        return { success: false, error: String(error) };
+      }
     }
   );
 }

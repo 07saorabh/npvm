@@ -4,6 +4,7 @@
 
 **Node Package Manager Visual Platform**
 
+[![npm version](https://img.shields.io/npm/v/@dext7r/npvm-cli.svg)](https://www.npmjs.com/package/@dext7r/npvm-cli)
 [![CI](https://github.com/h7ml/NPVM/actions/workflows/ci.yml/badge.svg)](https://github.com/h7ml/NPVM/actions/workflows/ci.yml)
 [![Release](https://github.com/h7ml/NPVM/actions/workflows/release.yml/badge.svg)](https://github.com/h7ml/NPVM/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -12,6 +13,8 @@
 [![Docker](https://img.shields.io/badge/docker-ready-blue)](https://hub.docker.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61dafb)](https://react.dev/)
+
+**[Live Demo](https://npvm.zeabur.app)** | **[API Server](https://npvm-server.zeabur.app)**
 
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 
@@ -36,6 +39,7 @@ NPVM is a modern visual platform for managing Node.js packages. It provides a cl
 - **Update Detection** - Check for package updates and deprecated packages
 - **Security Audit** - Scan for vulnerabilities in your dependencies
 - **Dependency Tree** - Visualize your dependency hierarchy
+- **Remote Repository Analysis** - Analyze GitHub/GitLab repos without cloning
 - **i18n Support** - English and Chinese interface
 - **Dark Mode** - Built-in dark theme support
 - **Swagger API** - RESTful API with Swagger documentation
@@ -47,17 +51,21 @@ NPVM is a modern visual platform for managing Node.js packages. It provides a cl
 - Node.js >= 20.0.0
 - pnpm >= 9.0.0
 
-### Installation
+### Install via npm
 
 ```bash
-# Clone the repository
+npm install -g @dext7r/npvm-cli
+
+# Launch
+npvm
+```
+
+### Install from source
+
+```bash
 git clone https://github.com/h7ml/NPVM.git
 cd NPVM
-
-# Install dependencies
 pnpm install
-
-# Start development server
 pnpm dev
 ```
 
@@ -74,14 +82,25 @@ docker build -t npvm .
 docker run -p 3456:3456 npvm
 ```
 
+### Deploy to Zeabur
+
+[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/templates/npvm)
+
+Or deploy manually:
+1. Fork this repository
+2. Create a new project on [Zeabur](https://zeabur.com)
+3. Import from GitHub and select the forked repo
+4. Zeabur will auto-detect Dockerfile and deploy
+
 ## Project Structure
 
 ```
 NPVM/
 ├── packages/
-│   ├── shared/          # Shared types and utilities
-│   ├── server/          # Fastify backend server
-│   └── web/             # React frontend
+│   ├── shared/          # @dext7r/npvm-shared - Shared types and utilities
+│   ├── server/          # @dext7r/npvm-server - Fastify backend server
+│   ├── cli/             # @dext7r/npvm-cli - CLI entry point
+│   └── web/             # @dext7r/npvm-web - React frontend
 ├── Dockerfile
 ├── docker-compose.yml
 └── turbo.json
@@ -111,6 +130,7 @@ Once the server is running, visit `http://localhost:3456/docs` for the Swagger A
 | POST | `/api/packages/uninstall` | Uninstall packages (SSE) |
 | POST | `/api/security/audit` | Run security audit |
 | GET | `/api/deps/tree` | Get dependency tree |
+| POST | `/api/remote/analyze` | Analyze remote repository |
 
 ## Development
 

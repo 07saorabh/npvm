@@ -5,7 +5,7 @@ import type {
   DependencyNode,
   AuditResult,
   OperationProgress,
-} from '@npvm/shared';
+} from '@dext7r/npvm-shared';
 
 export interface InstallOptions {
   dev?: boolean;

@@ -1,4 +1,4 @@
-import type { PackageManagerType } from '@npvm/shared';
+import type { PackageManagerType } from '@dext7r/npvm-shared';
 import type { PackageManagerAdapter } from './base.js';
 import { NpmAdapter } from './npm.js';
 import { YarnAdapter } from './yarn.js';

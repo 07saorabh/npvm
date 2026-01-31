@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Shield, AlertTriangle, AlertCircle, Info, Play } from 'lucide-react';
 import { useSecurityAudit } from '../../hooks/usePackages';
-import type { AuditResult } from '@npvm/shared';
+import type { AuditResult } from '@dext7r/npvm-shared';
 import { clsx } from 'clsx';
 
 const severityConfig = {

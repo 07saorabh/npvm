@@ -96,3 +96,10 @@ export function createSSEConnection(
       onError?.(String(error));
     });
 }
+
+export async function analyzeRemoteRepo(repoUrl: string, branch?: string) {
+  return fetchApi<import('@dext7r/npvm-shared').RemoteAnalysisResult>('/remote/analyze', {
+    method: 'POST',
+    body: JSON.stringify({ repoUrl, branch }),
+  });
+}

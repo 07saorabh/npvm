@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import open from 'open';
-import { startServer } from '@npvm/server';
+import { startServer } from '@dext7r/npvm-server';
 
 const program = new Command();
 

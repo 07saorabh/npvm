@@ -7,7 +7,7 @@ export default defineConfig({
   outDir: 'dist',
   clean: true,
   banner: { js: '#!/usr/bin/env node' },
-  noExternal: ['@npvm/server', '@npvm/shared'],
+  noExternal: ['@dext7r/npvm-server', '@npvm/shared'],
   splitting: false,
   sourcemap: false,
   minify: false,

@@ -7,7 +7,7 @@ import type {
   DependencyNode,
   AuditResult,
   OperationProgress,
-} from '@npvm/shared';
+} from '@dext7r/npvm-shared';
 import type { PackageManagerAdapter, InstallOptions, UninstallOptions } from './base.js';
 
 export class BunAdapter implements PackageManagerAdapter {

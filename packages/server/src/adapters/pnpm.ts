@@ -8,7 +8,7 @@ import type {
   AuditResult,
   OperationProgress,
   VulnerabilityInfo,
-} from '@npvm/shared';
+} from '@dext7r/npvm-shared';
 import type { PackageManagerAdapter, InstallOptions, UninstallOptions } from './base.js';
 
 export class PnpmAdapter implements PackageManagerAdapter {

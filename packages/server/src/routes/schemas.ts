@@ -192,4 +192,18 @@ export const routeSchemas = {
       },
     },
   },
+
+  analyzeRemoteRepo: {
+    tags: ['remote'],
+    summary: '分析远程仓库',
+    description: '分析 GitHub/GitLab 仓库的依赖、安全漏洞和更新状态',
+    body: {
+      type: 'object',
+      required: ['repoUrl'],
+      properties: {
+        repoUrl: { type: 'string', description: 'Git 仓库 URL' },
+        branch: { type: 'string', description: '分支名称（可选）' },
+      },
+    },
+  },
 };

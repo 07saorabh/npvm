@@ -6,9 +6,10 @@ import fastifySwaggerUi from '@fastify/swagger-ui';
 import { fileURLToPath } from 'url';
 import { dirname, join, resolve } from 'path';
 import { existsSync } from 'fs';
-import type { PackageManagerType } from '@npvm/shared';
+import type { PackageManagerType } from '@dext7r/npvm-shared';
 import { registerRoutes } from './routes/api.js';
 import { detectAllPackageManagers } from './adapters/index.js';
+import { getLandingPage } from './landing.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -25,7 +26,11 @@ function isProjectDirectory(dir: string): boolean {
 }
 
 export async function createServer(options: ServerOptions = {}) {
-  const { port = 3456, host = 'localhost', projectPath = process.cwd() } = options;
+  const {
+    port = 3456,
+    host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost',
+    projectPath = process.cwd()
+  } = options;
 
   // 确保使用绝对路径
   const absoluteProjectPath = resolve(projectPath);
@@ -90,15 +95,23 @@ export async function createServer(options: ServerOptions = {}) {
 
   // 静态文件服务（前端构建产物）
   const webDistPath = join(__dirname, '../../web/dist');
-  try {
+  if (existsSync(webDistPath)) {
     await app.register(fastifyStatic, {
       root: webDistPath,
       prefix: '/',
+      wildcard: false,
     });
-  } catch {
-    // 开发模式下可能没有构建产物
-    app.get('/', async () => {
-      return { message: 'NPVM Server running. Build the web package for UI.' };
+    // SPA fallback：非 API/docs 路由返回 index.html
+    app.setNotFoundHandler((req, reply) => {
+      if (req.url.startsWith('/api') || req.url.startsWith('/docs')) {
+        reply.code(404).send({ error: 'Not Found' });
+      } else {
+        reply.sendFile('index.html');
+      }
+    });
+  } else {
+    app.get('/', async (_request, reply) => {
+      reply.type('text/html').send(getLandingPage(port));
     });
   }
 

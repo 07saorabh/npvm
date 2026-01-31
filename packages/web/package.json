@@ -1,5 +1,5 @@
 {
-  "name": "@npvm/web",
+  "name": "@dext7r/npvm-web",
   "version": "0.1.0",
   "description": "React frontend for NPVM",
   "type": "module",
@@ -17,7 +17,7 @@
   "author": "h7ml",
   "license": "MIT",
   "dependencies": {
-    "@npvm/shared": "workspace:*",
+    "@dext7r/npvm-shared": "workspace:*",
     "@tanstack/react-query": "^5.64.0",
     "clsx": "^2.1.0",
     "i18next": "^24.2.3",

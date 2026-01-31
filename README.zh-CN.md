@@ -4,6 +4,7 @@
 
 **Node 包管理器可视化平台**
 
+[![npm version](https://img.shields.io/npm/v/@dext7r/npvm-cli.svg)](https://www.npmjs.com/package/@dext7r/npvm-cli)
 [![CI](https://github.com/h7ml/NPVM/actions/workflows/ci.yml/badge.svg)](https://github.com/h7ml/NPVM/actions/workflows/ci.yml)
 [![Release](https://github.com/h7ml/NPVM/actions/workflows/release.yml/badge.svg)](https://github.com/h7ml/NPVM/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -12,6 +13,8 @@
 [![Docker](https://img.shields.io/badge/docker-ready-blue)](https://hub.docker.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61dafb)](https://react.dev/)
+
+**[在线演示](https://npvm.zeabur.app)** | **[API 服务](https://npvm-server.zeabur.app)**
 
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 
@@ -32,6 +35,7 @@ NPVM 是一个现代化的 Node.js 包管理可视化平台。提供简洁的 We
 - **更新检测** - 检查包更新和废弃状态
 - **安全审计** - 扫描依赖中的安全漏洞
 - **依赖树** - 可视化依赖层级
+- **远程仓库分析** - 无需克隆即可分析 GitHub/GitLab 仓库
 - **国际化** - 支持中英文界面
 - **暗色模式** - 内置暗色主题
 - **Swagger API** - RESTful API 文档
@@ -43,17 +47,21 @@ NPVM 是一个现代化的 Node.js 包管理可视化平台。提供简洁的 We
 - Node.js >= 20.0.0
 - pnpm >= 9.0.0
 
-### 安装
+### 通过 npm 安装
 
 ```bash
-# 克隆仓库
+npm install -g @dext7r/npvm-cli
+
+# 启动
+npvm
+```
+
+### 从源码安装
+
+```bash
 git clone https://github.com/h7ml/NPVM.git
 cd NPVM
-
-# 安装依赖
 pnpm install
-
-# 启动开发服务器
 pnpm dev
 ```
 
@@ -70,14 +78,25 @@ docker build -t npvm .
 docker run -p 3456:3456 npvm
 ```
 
+### 部署到 Zeabur
+
+[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/templates/npvm)
+
+或手动部署：
+1. Fork 本仓库
+2. 在 [Zeabur](https://zeabur.com) 创建新项目
+3. 从 GitHub 导入并选择 fork 的仓库
+4. Zeabur 会自动检测 Dockerfile 并部署
+
 ## 项目结构
 
 ```
 NPVM/
 ├── packages/
-│   ├── shared/          # 共享类型和工具
-│   ├── server/          # Fastify 后端服务
-│   └── web/             # React 前端
+│   ├── shared/          # @dext7r/npvm-shared - 共享类型和工具
+│   ├── server/          # @dext7r/npvm-server - Fastify 后端服务
+│   ├── cli/             # @dext7r/npvm-cli - CLI 入口
+│   └── web/             # @dext7r/npvm-web - React 前端
 ├── Dockerfile
 ├── docker-compose.yml
 └── turbo.json
@@ -107,6 +126,7 @@ NPVM/
 | POST | `/api/packages/uninstall` | 卸载包 (SSE) |
 | POST | `/api/security/audit` | 运行安全审计 |
 | GET | `/api/deps/tree` | 获取依赖树 |
+| POST | `/api/remote/analyze` | 分析远程仓库 |
 
 ## 开发
 

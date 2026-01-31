@@ -36,21 +36,35 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 npvm
 
-# 复制构建产物
+# 复制 workspace 配置
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
 COPY --from=builder /app/pnpm-workspace.yaml ./
+
+# 复制 shared 构建产物
 COPY --from=builder /app/packages/shared/package.json ./packages/shared/
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
+
+# 复制 server 构建产物
 COPY --from=builder /app/packages/server/package.json ./packages/server/
 COPY --from=builder /app/packages/server/dist ./packages/server/dist
+
+# 复制 web 构建产物（由 server 静态托管）
 COPY --from=builder /app/packages/web/dist ./packages/web/dist
+
+# 复制 cli package.json（workspace 完整性）
+COPY --from=builder /app/packages/cli/package.json ./packages/cli/
+
+# web 的 package.json 也需要（pnpm workspace 解析）
+COPY --from=builder /app/packages/web/package.json ./packages/web/
 
 # 仅安装生产依赖
 RUN pnpm install --frozen-lockfile --prod
 
 # 切换用户
 USER npvm
+
+ENV NODE_ENV=production
 
 # 暴露端口
 EXPOSE 3456
@@ -59,5 +73,5 @@ EXPOSE 3456
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3456/api/pm/detect || exit 1
 
-# 启动服务
+# 启动服务（server 托管前端静态文件）
 CMD ["node", "packages/server/dist/index.js"]

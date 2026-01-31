@@ -1,5 +1,5 @@
 {
-  "name": "npvm-cli",
+  "name": "@dext7r/npvm-cli",
   "version": "0.1.0",
   "description": "Node Package Manager Visual Platform - CLI tool",
   "type": "module",
@@ -36,7 +36,7 @@
     "open": "^10.1.0"
   },
   "devDependencies": {
-    "@npvm/server": "workspace:*",
+    "@dext7r/npvm-server": "workspace:*",
     "tsup": "^8.5.1",
     "tsx": "^4.19.0",
     "typescript": "^5.7.0"
