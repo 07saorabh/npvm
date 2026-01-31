@@ -15,6 +15,9 @@ import {
   FileCode,
   Clock,
   Package,
+  History,
+  Trash2,
+  X,
 } from 'lucide-react';
 import { useSecurityAudit, useAuditFix } from '../../hooks/usePackages';
 import { useAppStore } from '../../stores/app';
@@ -136,10 +139,11 @@ function exportToHtml(report: AuditReport, t: (key: string) => string): void {
 
 export function SecurityAudit() {
   const { t } = useTranslation();
-  const { lastAuditReport } = useAppStore();
+  const { lastAuditReport, auditHistory, loadAuditFromHistory, removeAuditHistory, clearAuditHistory } = useAppStore();
   const [severityFilter, setSeverityFilter] = useState<SeverityFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   const auditMutation = useSecurityAudit();
   const fixMutation = useAuditFix();
@@ -196,6 +200,16 @@ export function SecurityAudit() {
           {t('security.title')}
         </h2>
         <div className="flex items-center gap-2 flex-wrap">
+          {/* 历史记录按钮 */}
+          <Button
+            variant="ghost"
+            onClick={() => setShowHistory(!showHistory)}
+            leftIcon={<History size={18} />}
+            className={clsx(showHistory && 'bg-gray-100 dark:bg-gray-700')}
+          >
+            {t('security.history')} {auditHistory.length > 0 && `(${auditHistory.length})`}
+          </Button>
+
           <Button
             onClick={handleAudit}
             loading={auditMutation.isPending}
@@ -249,6 +263,92 @@ export function SecurityAudit() {
           )}
         </div>
       </div>
+
+      {/* 历史记录面板 */}
+      {showHistory && (
+        <Card className="border-primary-200 dark:border-primary-800">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
+              <History size={18} />
+              {t('security.history')}
+            </h3>
+            {auditHistory.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearAuditHistory}
+                leftIcon={<Trash2 size={14} />}
+                className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+              >
+                {t('security.clearHistory')}
+              </Button>
+            )}
+          </div>
+          {auditHistory.length > 0 ? (
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+              {auditHistory.map((item) => {
+                const summary = item.report.result.summary;
+                const totalVulns = summary.critical + summary.high + summary.moderate + summary.low;
+                const isActive = lastAuditReport?.metadata.scannedAt === item.report.metadata.scannedAt;
+                return (
+                  <div
+                    key={item.id}
+                    className={clsx(
+                      'group flex items-center gap-3 p-3 rounded-lg border transition-colors cursor-pointer',
+                      isActive
+                        ? 'border-primary-300 dark:border-primary-600 bg-primary-50 dark:bg-primary-900/20'
+                        : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                    )}
+                    onClick={() => loadAuditFromHistory(item.id)}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Clock size={14} className="text-gray-400" />
+                        <span className="text-gray-600 dark:text-gray-300">
+                          {formatDate(item.timestamp)}
+                        </span>
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 truncate mt-1" title={item.projectPath}>
+                        {item.projectPath}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {summary.critical > 0 && (
+                        <span className="px-2 py-0.5 text-xs font-medium rounded bg-red-100 dark:bg-red-900/30 text-red-600">
+                          {summary.critical} {t('security.critical')}
+                        </span>
+                      )}
+                      {summary.high > 0 && (
+                        <span className="px-2 py-0.5 text-xs font-medium rounded bg-orange-100 dark:bg-orange-900/30 text-orange-600">
+                          {summary.high} {t('security.high')}
+                        </span>
+                      )}
+                      {totalVulns === 0 && (
+                        <span className="px-2 py-0.5 text-xs font-medium rounded bg-green-100 dark:bg-green-900/30 text-green-600">
+                          {t('security.noVulnerabilities')}
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeAuditHistory(item.id);
+                      }}
+                      className="p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-6 text-gray-500 dark:text-gray-400">
+              {t('security.noHistory')}
+            </div>
+          )}
+        </Card>
+      )}
 
       {/* Metadata */}
       {report && (

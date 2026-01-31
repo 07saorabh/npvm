@@ -118,7 +118,10 @@
     "projectPath": "Project Path",
     "packageManager": "Package Manager",
     "scanTime": "Scan Time",
-    "totalVulnerabilities": "Total Vulnerabilities"
+    "totalVulnerabilities": "Total Vulnerabilities",
+    "history": "History",
+    "clearHistory": "Clear History",
+    "noHistory": "No scan history yet"
   },
   "settings": {
     "title": "Settings",

@@ -118,7 +118,10 @@
     "projectPath": "项目路径",
     "packageManager": "包管理器",
     "scanTime": "扫描时间",
-    "totalVulnerabilities": "漏洞总数"
+    "totalVulnerabilities": "漏洞总数",
+    "history": "历史记录",
+    "clearHistory": "清空历史",
+    "noHistory": "暂无扫描历史"
   },
   "settings": {
     "title": "设置",

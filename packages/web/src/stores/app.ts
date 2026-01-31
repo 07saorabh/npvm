@@ -4,9 +4,17 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 
 type ThemeMode = 'light' | 'dark' | 'system';
 
+interface AuditHistoryItem {
+  id: string;
+  report: AuditReport;
+  projectPath: string;
+  timestamp: number;
+}
+
 interface AppState {
   currentPm: PackageManagerType;
   projectPath: string;
+  projectPathHistory: string[];
   currentRegistry: string;
   isDarkMode: boolean;
   themeMode: ThemeMode;
@@ -16,9 +24,12 @@ interface AppState {
   sidebarCollapsed: boolean;
   isMobileMenuOpen: boolean;
   lastAuditReport: AuditReport | null;
+  auditHistory: AuditHistoryItem[];
 
   setCurrentPm: (pm: PackageManagerType) => void;
   setProjectPath: (path: string) => void;
+  addProjectPathToHistory: (path: string) => void;
+  removeProjectPathFromHistory: (path: string) => void;
   setCurrentRegistry: (url: string) => void;
   toggleDarkMode: () => void;
   setThemeMode: (mode: ThemeMode) => void;
@@ -29,6 +40,10 @@ interface AppState {
   toggleSidebar: () => void;
   setMobileMenuOpen: (open: boolean) => void;
   setLastAuditReport: (report: AuditReport | null) => void;
+  addAuditHistory: (report: AuditReport) => void;
+  removeAuditHistory: (id: string) => void;
+  clearAuditHistory: () => void;
+  loadAuditFromHistory: (id: string) => void;
 }
 
 function applyTheme(mode: ThemeMode): boolean {
@@ -44,9 +59,10 @@ function applyTheme(mode: ThemeMode): boolean {
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       currentPm: 'npm',
       projectPath: '.',
+      projectPathHistory: [],
       currentRegistry: 'https://registry.npmjs.org/',
       isDarkMode: typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches,
       themeMode: 'system',
@@ -56,9 +72,25 @@ export const useAppStore = create<AppState>()(
       sidebarCollapsed: false,
       isMobileMenuOpen: false,
       lastAuditReport: null,
+      auditHistory: [],
 
       setCurrentPm: (pm) => set({ currentPm: pm }),
-      setProjectPath: (path) => set({ projectPath: path, isGlobal: false }),
+      setProjectPath: (path) => {
+        const { addProjectPathToHistory } = get();
+        addProjectPathToHistory(path);
+        set({ projectPath: path, isGlobal: false });
+      },
+      addProjectPathToHistory: (path) => {
+        if (!path || path === '.') return;
+        set((state) => {
+          const filtered = state.projectPathHistory.filter((p) => p !== path);
+          return { projectPathHistory: [path, ...filtered].slice(0, 10) };
+        });
+      },
+      removeProjectPathFromHistory: (path) =>
+        set((state) => ({
+          projectPathHistory: state.projectPathHistory.filter((p) => p !== path),
+        })),
       setCurrentRegistry: (url) => set({ currentRegistry: url }),
       toggleDarkMode: () =>
         set((state) => {
@@ -79,6 +111,28 @@ export const useAppStore = create<AppState>()(
       toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
       setMobileMenuOpen: (open) => set({ isMobileMenuOpen: open }),
       setLastAuditReport: (report) => set({ lastAuditReport: report }),
+      addAuditHistory: (report) =>
+        set((state) => {
+          const item: AuditHistoryItem = {
+            id: `audit-${Date.now()}`,
+            report,
+            projectPath: report.metadata.projectPath,
+            timestamp: report.metadata.scannedAt,
+          };
+          return { auditHistory: [item, ...state.auditHistory].slice(0, 20) };
+        }),
+      removeAuditHistory: (id) =>
+        set((state) => ({
+          auditHistory: state.auditHistory.filter((h) => h.id !== id),
+        })),
+      clearAuditHistory: () => set({ auditHistory: [] }),
+      loadAuditFromHistory: (id) => {
+        const { auditHistory } = get();
+        const item = auditHistory.find((h) => h.id === id);
+        if (item) {
+          set({ lastAuditReport: item.report });
+        }
+      },
     }),
     {
       name: 'npvm-app-state',
@@ -90,6 +144,9 @@ export const useAppStore = create<AppState>()(
         isGlobal: state.isGlobal,
         sidebarCollapsed: state.sidebarCollapsed,
         currentRegistry: state.currentRegistry,
+        projectPath: state.projectPath,
+        projectPathHistory: state.projectPathHistory,
+        auditHistory: state.auditHistory,
       }),
     }
   )
