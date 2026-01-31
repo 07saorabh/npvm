@@ -41,7 +41,18 @@
     "remoteAnalysis": "远程分析",
     "viewDocs": "使用文档",
     "changelog": "更新日志",
-    "settings": "设置"
+    "settings": "设置",
+    "pmSwitched": "包管理器已切换",
+    "pmSwitchedTo": "已切换到 {{pm}}",
+    "pmSwitchFailed": "切换失败",
+    "pmSwitchFailedMsg": "无法切换包管理器，请重试",
+    "pmUpgradeSuccess": "升级成功",
+    "pmUpgradedTo": "{{pm}} 已升级到最新版本",
+    "pmUpgradeFailed": "升级失败",
+    "pmUpgradeFailedMsg": "无法升级 {{pm}}，请手动执行升级命令",
+    "modeGlobal": "全局",
+    "modeProject": "项目",
+    "upgradeBtn": "升级 {{pm}}"
   },
   "packages": {
     "title": "已安装的包",

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable no-console */
 import { Command } from 'commander';
 import open from 'open';
 import { startServer } from '@dext7r/npvm-server';

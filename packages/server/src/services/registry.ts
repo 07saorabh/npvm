@@ -1,4 +1,3 @@
-import { execa } from 'execa';
 import type { PackageInfo } from '@dext7r/npvm-shared';
 
 const NPM_REGISTRY = 'https://registry.npmjs.org';

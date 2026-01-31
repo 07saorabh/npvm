@@ -52,7 +52,7 @@ export class YarnAdapter implements PackageManagerAdapter {
               }
             }
           }
-        } catch {}
+        } catch { /* ignore parse errors */ }
       }
 
       return packages;
@@ -84,7 +84,7 @@ export class YarnAdapter implements PackageManagerAdapter {
               }
             }
           }
-        } catch {}
+        } catch { /* ignore parse errors */ }
       }
 
       return packages;
@@ -211,7 +211,7 @@ export class YarnAdapter implements PackageManagerAdapter {
           if (data.type === 'tree') {
             return this.parseYarnTree(data.data);
           }
-        } catch {}
+        } catch { /* ignore parse errors */ }
       }
 
       return { name: 'root', version: '0.0.0', children: [] };
@@ -284,7 +284,7 @@ export class YarnAdapter implements PackageManagerAdapter {
               total: data.data.vulnerabilities.total || 0,
             };
           }
-        } catch {}
+        } catch { /* ignore parse errors */ }
       }
 
       return { vulnerabilities, summary };

@@ -54,13 +54,13 @@ export function parseInputType(input: string): { type: InputType; value: string;
 export function parseGitUrl(url: string): RemoteRepoInfo {
   const patterns = [
     // https://github.com/owner/repo
-    /^https?:\/\/github\.com\/([^\/]+)\/([^\/]+?)(?:\.git)?(?:\/tree\/([^\/]+))?$/,
+    /^https?:\/\/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?(?:\/tree\/([^/]+))?$/,
     // git@github.com:owner/repo.git
-    /^git@github\.com:([^\/]+)\/([^\/]+?)(?:\.git)?$/,
+    /^git@github\.com:([^/]+)\/([^/]+?)(?:\.git)?$/,
     // https://gitlab.com/owner/repo
-    /^https?:\/\/gitlab\.com\/([^\/]+)\/([^\/]+?)(?:\.git)?(?:\/-\/tree\/([^\/]+))?$/,
+    /^https?:\/\/gitlab\.com\/([^/]+)\/([^/]+?)(?:\.git)?(?:\/-\/tree\/([^/]+))?$/,
     // git@gitlab.com:owner/repo.git
-    /^git@gitlab\.com:([^\/]+)\/([^\/]+?)(?:\.git)?$/,
+    /^git@gitlab\.com:([^/]+)\/([^/]+?)(?:\.git)?$/,
   ];
 
   for (const pattern of patterns) {

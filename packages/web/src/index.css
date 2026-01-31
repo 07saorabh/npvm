@@ -7,6 +7,24 @@
   line-height: 1.5;
   font-weight: 400;
   --color-primary: 34 197 94;
+
+  --background: 249 250 251;
+  --foreground: 17 24 39;
+  --card: 255 255 255;
+  --card-foreground: 17 24 39;
+  --border: 229 231 235;
+  --muted: 243 244 246;
+  --muted-foreground: 107 114 128;
+}
+
+.dark {
+  --background: 17 24 39;
+  --foreground: 249 250 251;
+  --card: 31 41 55;
+  --card-foreground: 249 250 251;
+  --border: 55 65 81;
+  --muted: 31 41 55;
+  --muted-foreground: 156 163 175;
 }
 
 body {
@@ -44,7 +62,7 @@ body {
   }
 }
 
-/* 动画入场 */
+/* 动画 & 工具 */
 @layer utilities {
   .animate-in {
     animation: fadeIn 0.2s ease-out, scaleIn 0.2s ease-out;
@@ -55,7 +73,44 @@ body {
   }
 
   .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900;
+  }
+}
+
+/* Skeleton wave 动画 */
+.skeleton-wave {
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-wave::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: skeleton-wave 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-wave {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* 页面过渡 */
+.page-enter {
+  animation: pageEnter 0.2s ease-out;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -81,4 +136,12 @@ body {
 
 .gradient-border:hover::before {
   opacity: 1;
+}
+
+/* 减弱动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

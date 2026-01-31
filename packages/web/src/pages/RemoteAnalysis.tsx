@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -113,12 +113,15 @@ export function RemoteAnalysis() {
   const { t } = useTranslation();
   const { addToast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [repoUrl, setRepoUrl] = useState('');
-  const [branch, setBranch] = useState('main');
+  const initialQ = searchParams.get('q') || '';
+  const initialBranch = searchParams.get('branch') || 'main';
+  const [repoUrl, setRepoUrl] = useState(initialQ);
+  const [branch, setBranch] = useState(initialBranch);
   const [result, setResult] = useState<RemoteAnalysisResult | null>(null);
   const [copiedPm, setCopiedPm] = useState<string | null>(null);
   const [copiedShare, setCopiedShare] = useState(false);
   const analysisMutation = useRemoteAnalysis();
+  const initializedRef = useRef(false);
 
   const isNpmSource = result?.sourceType === 'npm';
 
@@ -145,16 +148,20 @@ export function RemoteAnalysis() {
     }
   }, [repoUrl, branch, analysisMutation, setSearchParams]);
 
-  // 从 URL 参数初始化
+  // 从 URL 参数初始化分析（直接调用 mutation，不通过 handleAnalyze 避免 setState-in-effect）
   useEffect(() => {
-    const q = searchParams.get('q');
-    const branchParam = searchParams.get('branch');
-    if (q && !result && !analysisMutation.isPending) {
-      setRepoUrl(q);
-      if (branchParam) setBranch(branchParam);
-      handleAnalyze(q, branchParam || undefined);
-    }
-  }, []);
+    if (initializedRef.current || !initialQ || analysisMutation.isPending) return;
+    initializedRef.current = true;
+    const branchVal = initialBranch !== 'main' ? initialBranch : undefined;
+    analysisMutation.mutateAsync({
+      repoUrl: initialQ.trim(),
+      branch: branchVal?.trim() || undefined,
+    }).then((data) => {
+      setResult(data);
+    }).catch(() => {
+      // 初始化分析失败时不做额外处理
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const generateShareUrl = () => {
     const params = new URLSearchParams();

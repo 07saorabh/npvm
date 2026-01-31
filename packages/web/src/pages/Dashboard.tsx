@@ -5,19 +5,21 @@ import { usePackageManagers, useInstalledPackages } from '../hooks/usePackages';
 import { useAppStore } from '../stores/app';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '../components/ui/Toast';
-import { Card, Badge, Button } from '../components/ui';
+import { Card, Badge, Button, Skeleton } from '../components/ui';
 import { useState } from 'react';
 import type { PackageManagerType } from '@dext7r/npvm-shared';
 import { clsx } from 'clsx';
 
 export function Dashboard() {
   const { t } = useTranslation();
-  const { data: managers = [], refetch: refetchManagers } = usePackageManagers();
-  const { data: packages = [] } = useInstalledPackages();
+  const { data: managers = [], isLoading: managersLoading, refetch: refetchManagers } = usePackageManagers();
+  const { data: packages = [], isLoading: packagesLoading } = useInstalledPackages();
   const { currentPm, setCurrentPm, isGlobal } = useAppStore();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const [upgradingPm, setUpgradingPm] = useState<string | null>(null);
+
+  const isLoading = managersLoading || packagesLoading;
 
   const availableManagers = managers.filter((m) => m.available);
   const devPackages = packages.filter((p) => p.isDev);
@@ -38,15 +40,15 @@ export function Dashboard() {
       queryClient.invalidateQueries({ queryKey: ['packages'] });
       addToast({
         type: 'success',
-        title: '包管理器已切换',
-        message: `已切换到 ${type}`,
+        title: t('dashboard.pmSwitched'),
+        message: t('dashboard.pmSwitchedTo', { pm: type }),
       });
     } catch {
       setCurrentPm(prevPm);
       addToast({
         type: 'error',
-        title: '切换失败',
-        message: '无法切换包管理器，请重试',
+        title: t('dashboard.pmSwitchFailed'),
+        message: t('dashboard.pmSwitchFailedMsg'),
       });
     }
   };
@@ -65,8 +67,8 @@ export function Dashboard() {
         await refetchManagers();
         addToast({
           type: 'success',
-          title: '升级成功',
-          message: `${type} 已升级到最新版本`,
+          title: t('dashboard.pmUpgradeSuccess'),
+          message: t('dashboard.pmUpgradedTo', { pm: type }),
         });
       } else {
         throw new Error('升级失败');
@@ -74,8 +76,8 @@ export function Dashboard() {
     } catch {
       addToast({
         type: 'error',
-        title: '升级失败',
-        message: `无法升级 ${type}，请手动执行升级命令`,
+        title: t('dashboard.pmUpgradeFailed'),
+        message: t('dashboard.pmUpgradeFailedMsg', { pm: type }),
       });
     } finally {
       setUpgradingPm(null);
@@ -89,31 +91,49 @@ export function Dashboard() {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          icon={Package}
-          label={t('dashboard.totalPackages')}
-          value={packages.length}
-          color="primary"
-          subtitle={isGlobal ? '全局' : '项目'}
-        />
-        <StatCard
-          icon={Package}
-          label={t('dashboard.dependencies')}
-          value={prodPackages.length}
-          color="green"
-        />
-        <StatCard
-          icon={Package}
-          label={t('dashboard.devDependencies')}
-          value={devPackages.length}
-          color="yellow"
-        />
-        <StatCard
-          icon={AlertTriangle}
-          label={t('dashboard.packageManagers')}
-          value={availableManagers.length}
-          color="blue"
-        />
+        {isLoading ? (
+          <>
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i}>
+                <div className="flex items-center gap-3">
+                  <Skeleton variant="rectangular" width={44} height={44} className="rounded-xl" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton width="60%" height={28} />
+                    <Skeleton width="40%" height={16} />
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </>
+        ) : (
+          <>
+            <StatCard
+              icon={Package}
+              label={t('dashboard.totalPackages')}
+              value={packages.length}
+              color="primary"
+              subtitle={isGlobal ? t('dashboard.modeGlobal') : t('dashboard.modeProject')}
+            />
+            <StatCard
+              icon={Package}
+              label={t('dashboard.dependencies')}
+              value={prodPackages.length}
+              color="green"
+            />
+            <StatCard
+              icon={Package}
+              label={t('dashboard.devDependencies')}
+              value={devPackages.length}
+              color="yellow"
+            />
+            <StatCard
+              icon={AlertTriangle}
+              label={t('dashboard.packageManagers')}
+              value={availableManagers.length}
+              color="blue"
+            />
+          </>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -164,7 +184,7 @@ export function Dashboard() {
                       size="icon"
                       onClick={() => handleUpgradePm(m.type)}
                       loading={upgradingPm === m.type}
-                      title={`升级 ${m.type}`}
+                      title={t('dashboard.upgradeBtn', { pm: m.type })}
                     >
                       <ArrowUp size={14} />
                     </Button>

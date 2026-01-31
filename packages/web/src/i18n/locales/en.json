@@ -41,7 +41,18 @@
     "remoteAnalysis": "Remote Analysis",
     "viewDocs": "Documentation",
     "changelog": "Changelog",
-    "settings": "Settings"
+    "settings": "Settings",
+    "pmSwitched": "Package Manager Switched",
+    "pmSwitchedTo": "Switched to {{pm}}",
+    "pmSwitchFailed": "Switch Failed",
+    "pmSwitchFailedMsg": "Failed to switch package manager, please retry",
+    "pmUpgradeSuccess": "Upgrade Success",
+    "pmUpgradedTo": "{{pm}} upgraded to latest version",
+    "pmUpgradeFailed": "Upgrade Failed",
+    "pmUpgradeFailedMsg": "Failed to upgrade {{pm}}, please run upgrade manually",
+    "modeGlobal": "Global",
+    "modeProject": "Project",
+    "upgradeBtn": "Upgrade {{pm}}"
   },
   "packages": {
     "title": "Installed Packages",

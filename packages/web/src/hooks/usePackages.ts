@@ -183,6 +183,12 @@ export function useUpdatePackage() {
   });
 }
 
+interface AuditSSEData {
+  type: 'progress' | 'result';
+  message?: string;
+  data?: AuditResult;
+}
+
 export function useSecurityAudit() {
   const { addTerminalLog } = useAppStore();
 
@@ -194,10 +200,10 @@ export function useSecurityAudit() {
         createSSEConnection(
           '/security/audit',
           {},
-          (data: any) => {
-            if (data.type === 'progress') {
+          (data: AuditSSEData) => {
+            if (data.type === 'progress' && data.message) {
               addTerminalLog(data.message);
-            } else if (data.type === 'result') {
+            } else if (data.type === 'result' && data.data) {
               result = data.data;
             }
           },
