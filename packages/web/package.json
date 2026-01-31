@@ -3,6 +3,10 @@
   "version": "0.2.0",
   "description": "React frontend for npvm",
   "type": "module",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

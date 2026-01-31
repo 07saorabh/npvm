@@ -6,6 +6,10 @@
   "bin": {
     "npvm": "./dist/index.js"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsup",
     "start": "tsx src/index.ts start",
