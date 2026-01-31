@@ -36,6 +36,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           'inline-flex items-center justify-center font-medium rounded-lg',
           'transition-all duration-150 ease-out',
           'focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900',
+          // 点击动画
+          'active:scale-95 active:transition-transform active:duration-75',
           // 尺寸
           size === 'sm' && 'px-3 py-1.5 text-sm gap-1.5',
           size === 'md' && 'px-4 py-2 text-sm gap-2',
@@ -46,28 +48,29 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             'bg-primary-500 text-white',
             'hover:bg-primary-600 active:bg-primary-700',
             'focus:ring-primary-500/50',
-            'shadow-sm hover:shadow-md',
+            'shadow-sm hover:shadow-md active:shadow-sm',
           ],
           variant === 'secondary' && [
             'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100',
-            'hover:bg-gray-200 dark:hover:bg-gray-600',
+            'hover:bg-gray-200 dark:hover:bg-gray-600 active:bg-gray-300 dark:active:bg-gray-500',
             'focus:ring-gray-500/50',
           ],
           variant === 'outline' && [
             'border border-gray-300 dark:border-gray-600',
             'text-gray-700 dark:text-gray-300',
-            'hover:bg-gray-50 dark:hover:bg-gray-800',
+            'hover:bg-gray-50 dark:hover:bg-gray-800 active:bg-gray-100 dark:active:bg-gray-700',
             'focus:ring-gray-500/50',
           ],
           variant === 'ghost' && [
             'text-gray-700 dark:text-gray-300',
-            'hover:bg-gray-100 dark:hover:bg-gray-800',
+            'hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-200 dark:active:bg-gray-700',
             'focus:ring-gray-500/50',
           ],
           variant === 'destructive' && [
             'bg-red-500 text-white',
             'hover:bg-red-600 active:bg-red-700',
             'focus:ring-red-500/50',
+            'shadow-sm hover:shadow-md active:shadow-sm',
           ],
           // 禁用状态
           isDisabled && 'opacity-50 cursor-not-allowed pointer-events-none',
