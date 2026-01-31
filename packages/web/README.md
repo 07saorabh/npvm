@@ -1,6 +1,6 @@
 # @dext7r/npvm-web
 
-NPVM Web frontend built with React 18 + Vite + TypeScript + TailwindCSS.
+npvm Web frontend built with React 18 + Vite + TypeScript + TailwindCSS.
 
 **[Live Demo](https://npvm.zeabur.app)**
 

@@ -8,6 +8,7 @@ import { dirname, join, resolve } from 'path';
 import { existsSync } from 'fs';
 import type { PackageManagerType } from '@dext7r/npvm-shared';
 import { registerRoutes } from './routes/api.js';
+import { registerSeoRoutes } from './routes/seo.js';
 import { detectAllPackageManagers } from './adapters/index.js';
 import { getLandingPage } from './landing.js';
 
@@ -47,7 +48,7 @@ export async function createServer(options: ServerOptions = {}) {
     openapi: {
       openapi: '3.0.0',
       info: {
-        title: 'NPVM API',
+        title: 'npvm API',
         description: 'Node Package Manager Visual Platform API',
         version: '0.1.0',
       },
@@ -93,6 +94,9 @@ export async function createServer(options: ServerOptions = {}) {
   // 注册 API 路由
   await registerRoutes(app, state);
 
+  // 注册 SEO 路由 (sitemap, rss, atom, robots.txt)
+  await registerSeoRoutes(app);
+
   // 静态文件服务（前端构建产物）
   const webDistPath = join(__dirname, '../../web/dist');
   if (existsSync(webDistPath)) {
@@ -123,7 +127,7 @@ export async function startServer(options: ServerOptions = {}) {
 
   try {
     await app.listen({ port, host });
-    console.warn(`\n🚀 NPVM Server running at http://${host}:${port}\n`);
+    console.warn(`\n🚀 npvm Server running at http://${host}:${port}\n`);
     return app;
   } catch (err) {
     app.log.error(err);

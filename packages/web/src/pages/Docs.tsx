@@ -10,6 +10,10 @@ import {
   Rocket,
   BookOpen,
   ExternalLink,
+  Cloud,
+  HelpCircle,
+  Zap,
+  FileJson,
 } from 'lucide-react';
 import { Card, Badge } from '../components/ui';
 import { clsx } from 'clsx';
@@ -77,7 +81,7 @@ export function Docs() {
           {t('docs.title')}
         </h2>
         <a
-          href="https://github.com/h7ml/NPVM"
+          href="https://github.com/h7ml/npvm"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1.5 text-sm text-primary-500 hover:text-primary-600"
@@ -87,7 +91,7 @@ export function Docs() {
       </div>
 
       <div className="bg-gradient-to-r from-primary-500 to-purple-500 rounded-lg p-6 text-white">
-        <h3 className="text-2xl font-bold mb-2">NPVM</h3>
+        <h3 className="text-2xl font-bold mb-2">npvm</h3>
         <p className="text-white/90">{t('docs.description')}</p>
         <div className="flex flex-wrap gap-2 mt-4">
           {['React 18', 'Vite', 'TypeScript', 'TailwindCSS', 'Fastify', 'Node.js'].map((tech) => (
@@ -103,7 +107,7 @@ export function Docs() {
         <p>{t('docs.quickStartDesc')}</p>
         <CodeBlock>{`npm install -g @dext7r/npvm-cli\nnpvm`}</CodeBlock>
         <p>{t('docs.quickStartAlt')}</p>
-        <CodeBlock>{`git clone https://github.com/h7ml/NPVM.git\ncd NPVM\npnpm install\npnpm dev`}</CodeBlock>
+        <CodeBlock>{`git clone https://github.com/h7ml/npvm.git\ncd npvm\npnpm install\npnpm dev`}</CodeBlock>
       </DocSection>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -219,6 +223,81 @@ export function Docs() {
             <div key={keys} className="flex items-center justify-between py-1.5 px-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
               <span>{desc}</span>
               <KeyboardShortcut keys={keys} />
+            </div>
+          ))}
+        </div>
+      </DocSection>
+
+      {/* 部署指南 */}
+      <DocSection icon={Cloud} title={t('docs.deployment')} color="cyan">
+        <p>{t('docs.deploymentDesc')}</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3">
+          {[
+            { name: 'Zeabur', url: 'https://npvm.zeabur.app', icon: '🚀' },
+            { name: 'Vercel', url: 'https://npvm.vercel.app', icon: '▲' },
+            { name: 'Cloudflare', url: 'https://npvm.pages.dev', icon: '☁️' },
+            { name: 'Netlify', url: 'https://npvm.netlify.app', icon: '🌐' },
+            { name: 'Railway', url: 'https://npvm.up.railway.app', icon: '🚂' },
+            { name: 'Render', url: 'https://npvm.onrender.com', icon: '🎨' },
+          ].map(({ name, url, icon }) => (
+            <a
+              key={name}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              <span>{icon}</span>
+              <span className="text-sm font-medium">{name}</span>
+              <ExternalLink size={12} className="ml-auto text-gray-400" />
+            </a>
+          ))}
+        </div>
+        <div className="mt-4">
+          <p className="font-medium mb-2">{t('docs.dockerDeploy')}</p>
+          <CodeBlock>{`docker pull h7ml/npvm:latest\ndocker run -p 3456:3456 h7ml/npvm`}</CodeBlock>
+        </div>
+      </DocSection>
+
+      {/* 新功能 */}
+      <DocSection icon={Zap} title={t('docs.newFeatures')} color="orange">
+        <div className="space-y-3">
+          <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+            <FileJson size={18} className="text-blue-500 mt-0.5" />
+            <div>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{t('docs.featureImport')}</p>
+              <p className="text-xs text-gray-500 mt-1">{t('docs.featureImportDesc')}</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+            <Monitor size={18} className="text-purple-500 mt-0.5" />
+            <div>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{t('docs.featureDetail')}</p>
+              <p className="text-xs text-gray-500 mt-1">{t('docs.featureDetailDesc')}</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+            <GitBranch size={18} className="text-green-500 mt-0.5" />
+            <div>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{t('docs.featureVersion')}</p>
+              <p className="text-xs text-gray-500 mt-1">{t('docs.featureVersionDesc')}</p>
+            </div>
+          </div>
+        </div>
+      </DocSection>
+
+      {/* FAQ */}
+      <DocSection icon={HelpCircle} title={t('docs.faq')} color="pink">
+        <div className="space-y-4">
+          {[
+            { q: t('docs.faq1Q'), a: t('docs.faq1A') },
+            { q: t('docs.faq2Q'), a: t('docs.faq2A') },
+            { q: t('docs.faq3Q'), a: t('docs.faq3A') },
+            { q: t('docs.faq4Q'), a: t('docs.faq4A') },
+          ].map(({ q, a }, i) => (
+            <div key={i} className="border-b border-gray-100 dark:border-gray-700/50 pb-3 last:border-0">
+              <p className="font-medium text-gray-800 dark:text-gray-200 mb-1">{q}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">{a}</p>
             </div>
           ))}
         </div>

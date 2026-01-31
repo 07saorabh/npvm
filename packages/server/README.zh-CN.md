@@ -1,6 +1,6 @@
 # @dext7r/npvm-server
 
-NPVM 后端服务，基于 Fastify 构建。
+npvm 后端服务，基于 Fastify 构建。
 
 **[在线演示](https://npvm.zeabur.app)** | **[API 文档](https://npvm.zeabur.app/docs)**
 

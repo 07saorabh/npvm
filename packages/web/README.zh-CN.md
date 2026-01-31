@@ -1,6 +1,6 @@
 # @dext7r/npvm-web
 
-NPVM Web 前端，基于 React 18 + Vite + TypeScript + TailwindCSS 构建。
+npvm Web 前端，基于 React 18 + Vite + TypeScript + TailwindCSS 构建。
 
 **[在线演示](https://npvm.zeabur.app)**
 

@@ -12,8 +12,10 @@ import type {
   DependencyInfo,
   NpmAuditAdvisory,
 } from '@dext7r/npvm-shared';
-import type { PackageManagerAdapter, InstallOptions, UninstallOptions } from './base.js';
+import type { PackageManagerAdapter, InstallOptions, UninstallOptions, WorkspaceInfo } from './base.js';
 import { validatePackageNames, validateUrl } from '../utils/security.js';
+import { existsSync } from 'fs';
+import { join } from 'path';
 
 export class PnpmAdapter implements PackageManagerAdapter {
   readonly type = 'pnpm' as const;
@@ -30,6 +32,27 @@ export class PnpmAdapter implements PackageManagerAdapter {
       };
     } catch {
       return { type: 'pnpm', version: '', path: '', available: false };
+    }
+  }
+
+  async detectWorkspace(cwd: string): Promise<WorkspaceInfo> {
+    try {
+      // 检查 pnpm-workspace.yaml
+      const workspaceFile = join(cwd, 'pnpm-workspace.yaml');
+      if (!existsSync(workspaceFile)) {
+        return { isWorkspace: false };
+      }
+
+      // 获取 workspace 包列表
+      const { stdout } = await execa('pnpm', ['ls', '-r', '--json', '--depth=0'], { cwd });
+      const data = JSON.parse(stdout);
+      const packages = Array.isArray(data)
+        ? data.map((p: { name?: string }) => p.name).filter((n): n is string => typeof n === 'string')
+        : [];
+
+      return { isWorkspace: true, packages };
+    } catch {
+      return { isWorkspace: false };
     }
   }
 
@@ -109,6 +132,8 @@ export class PnpmAdapter implements PackageManagerAdapter {
     const args = ['add', ...packages];
     if (options?.dev) args.push('--save-dev');
     if (options?.global) args.push('-g');
+    if (options?.workspace) args.push('-w');  // 安装到 workspace 根目录
+    if (options?.filter) args.push('--filter', options.filter);  // 安装到指定包
     if (options?.registry) args.push('--registry', options.registry);
 
     const operationId = randomUUID();
@@ -158,6 +183,8 @@ export class PnpmAdapter implements PackageManagerAdapter {
 
     const args = ['remove', ...packages];
     if (options?.global) args.push('-g');
+    if (options?.workspace) args.push('-w');
+    if (options?.filter) args.push('--filter', options.filter);
 
     const operationId = randomUUID();
     const progress: OperationProgress = {

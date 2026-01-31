@@ -4,7 +4,7 @@ export function getLandingPage(port: number): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NPVM API</title>
+  <title>npvm API</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -239,7 +239,7 @@ export function getLandingPage(port: number): string {
     <header>
       <div class="logo">
         <div class="logo-icon">📦</div>
-        <h1>NPVM API</h1>
+        <h1>npvm API</h1>
       </div>
       <p class="subtitle">Node Package Manager Visual Platform</p>
       <span class="badge">v0.1.0 • Running on port ${port}</span>
@@ -372,7 +372,7 @@ export function getLandingPage(port: number): string {
       <a href="/docs" class="btn btn-primary">
         📖 Interactive API Docs
       </a>
-      <a href="https://github.com/h7ml/NPVM" class="btn btn-secondary" target="_blank">
+      <a href="https://github.com/h7ml/npvm" class="btn btn-secondary" target="_blank">
         ⭐ GitHub
       </a>
     </div>

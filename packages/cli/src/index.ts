@@ -21,7 +21,7 @@ program
     const port = parseInt(options.port, 10);
     const projectPath = options.dir;
 
-    console.log('🚀 Starting NPVM...');
+    console.log('🚀 Starting npvm...');
     console.log(`📁 Project: ${projectPath}`);
 
     await startServer({
@@ -49,7 +49,7 @@ program
     const port = parseInt(options.port, 10);
     const projectPath = options.dir;
 
-    console.log('🔧 Starting NPVM in dev mode...');
+    console.log('🔧 Starting npvm in dev mode...');
     console.log(`📁 Project: ${projectPath}`);
 
     await startServer({

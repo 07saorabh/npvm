@@ -13,8 +13,10 @@ import type {
   NpmAuditVulnerability,
   NpmAuditAdvisory,
 } from '@dext7r/npvm-shared';
-import type { PackageManagerAdapter, InstallOptions, UninstallOptions } from './base.js';
+import type { PackageManagerAdapter, InstallOptions, UninstallOptions, WorkspaceInfo } from './base.js';
 import { validatePackageNames, validateUrl } from '../utils/security.js';
+import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
 
 export class NpmAdapter implements PackageManagerAdapter {
   readonly type = 'npm' as const;
@@ -31,6 +33,29 @@ export class NpmAdapter implements PackageManagerAdapter {
       };
     } catch {
       return { type: 'npm', version: '', path: '', available: false };
+    }
+  }
+
+  async detectWorkspace(cwd: string): Promise<WorkspaceInfo> {
+    try {
+      const pkgPath = join(cwd, 'package.json');
+      if (!existsSync(pkgPath)) {
+        return { isWorkspace: false };
+      }
+
+      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+      if (!pkg.workspaces) {
+        return { isWorkspace: false };
+      }
+
+      // npm workspaces 在 package.json 中定义
+      const { stdout } = await execa('npm', ['query', '.workspace'], { cwd, reject: false });
+      const workspaces = JSON.parse(stdout || '[]');
+      const packages = workspaces.map((w: { name?: string }) => w.name).filter(Boolean);
+
+      return { isWorkspace: true, packages };
+    } catch {
+      return { isWorkspace: false };
     }
   }
 
@@ -95,6 +120,8 @@ export class NpmAdapter implements PackageManagerAdapter {
     const args = ['install', ...packages];
     if (options?.dev) args.push('--save-dev');
     if (options?.global) args.push('-g');
+    if (options?.workspace) args.push('-w');  // npm v7+ workspace root
+    if (options?.filter) args.push('-w', options.filter);  // 安装到指定 workspace
     if (options?.registry) args.push('--registry', options.registry);
 
     const operationId = randomUUID();
@@ -144,6 +171,8 @@ export class NpmAdapter implements PackageManagerAdapter {
 
     const args = ['uninstall', ...packages];
     if (options?.global) args.push('-g');
+    if (options?.workspace) args.push('-w');
+    if (options?.filter) args.push('-w', options.filter);
 
     const operationId = randomUUID();
     const progress: OperationProgress = {

@@ -1,20 +1,20 @@
 apiVersion: zeabur.com/v1
 kind: Template
 metadata:
-  name: NPVM
+  name: npvm
   description: Node Package Manager Visual Platform - A modern web UI for managing npm/yarn/pnpm/bun packages
   tags:
     - npm
     - package-manager
     - nodejs
     - developer-tools
-  icon: https://raw.githubusercontent.com/h7ml/NPVM/main/packages/web/public/favicon.svg
+  icon: https://raw.githubusercontent.com/h7ml/npvm/main/packages/web/public/favicon.svg
 spec:
   services:
     - name: npvm
       template: GIT
       source:
-        repoURL: https://github.com/h7ml/NPVM
+        repoURL: https://github.com/h7ml/npvm
         branch: main
       build:
         buildCommand: pnpm install && pnpm build

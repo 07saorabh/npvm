@@ -100,7 +100,7 @@ export function Sidebar() {
           )}
         >
           <div className="flex items-center justify-between h-14 px-4 border-b border-gray-200 dark:border-gray-700">
-            <span className="font-bold text-lg text-primary-600">NPVM</span>
+            <NavLink to="/" className="font-bold text-lg text-primary-600 hover:text-primary-700 dark:hover:text-primary-300 transition-colors">npvm</NavLink>
             <button
               onClick={() => setMobileMenuOpen(false)}
               className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50"
@@ -124,7 +124,7 @@ export function Sidebar() {
     >
       <div className="flex items-center justify-between h-14 px-4 border-b border-gray-200 dark:border-gray-700">
         {!sidebarCollapsed && (
-          <span className="font-bold text-lg text-primary-600">NPVM</span>
+          <NavLink to="/" className="font-bold text-lg text-primary-600 hover:text-primary-700 dark:hover:text-primary-300 transition-colors">npvm</NavLink>
         )}
         <button
           onClick={toggleSidebar}

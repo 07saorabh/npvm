@@ -1,12 +1,12 @@
 <div align="center">
 
-# NPVM
+# npvm
 
 **Node 包管理器可视化平台**
 
 [![npm version](https://img.shields.io/npm/v/@dext7r/npvm-cli.svg)](https://www.npmjs.com/package/@dext7r/npvm-cli)
-[![CI](https://github.com/h7ml/NPVM/actions/workflows/ci.yml/badge.svg)](https://github.com/h7ml/NPVM/actions/workflows/ci.yml)
-[![Release](https://github.com/h7ml/NPVM/actions/workflows/release.yml/badge.svg)](https://github.com/h7ml/NPVM/actions/workflows/release.yml)
+[![CI](https://github.com/h7ml/npvm/actions/workflows/ci.yml/badge.svg)](https://github.com/h7ml/npvm/actions/workflows/ci.yml)
+[![Release](https://github.com/h7ml/npvm/actions/workflows/release.yml/badge.svg)](https://github.com/h7ml/npvm/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-9.x-orange)](https://pnpm.io/)
@@ -24,7 +24,7 @@
 
 ## 概述
 
-NPVM 是一个现代化的 Node.js 包管理可视化平台。提供简洁的 Web 界面来管理 npm/yarn/pnpm/bun 的全局和项目级别包。
+npvm 是一个现代化的 Node.js 包管理可视化平台。提供简洁的 Web 界面来管理 npm/yarn/pnpm/bun 的全局和项目级别包。
 
 ## 功能特性
 
@@ -33,9 +33,12 @@ NPVM 是一个现代化的 Node.js 包管理可视化平台。提供简洁的 We
 - **镜像源管理** - 在 npm、淘宝、腾讯等镜像源间切换
 - **包操作** - 安装、卸载、更新包，实时进度显示
 - **更新检测** - 检查包更新和废弃状态
-- **安全审计** - 扫描依赖中的安全漏洞
+- **安全审计** - 扫描依赖漏洞，支持导出报告（JSON/CSV/HTML）
 - **依赖树** - 可视化依赖层级
 - **远程仓库分析** - 无需克隆即可分析 GitHub/GitLab 仓库
+- **包详情弹窗** - 查看包详细信息，支持全屏切换
+- **package.json 导入** - 从本地文件或 URL 导入依赖批量安装
+- **版本检测** - 对比本地构建与 GitHub 最新提交
 - **国际化** - 支持中英文界面
 - **暗色模式** - 内置暗色主题
 - **Swagger API** - RESTful API 文档
@@ -59,8 +62,8 @@ npvm
 ### 从源码安装
 
 ```bash
-git clone https://github.com/h7ml/NPVM.git
-cd NPVM
+git clone https://github.com/h7ml/npvm.git
+cd npvm
 pnpm install
 pnpm dev
 ```
@@ -91,7 +94,7 @@ docker run -p 3456:3456 npvm
 ## 项目结构
 
 ```
-NPVM/
+npvm/
 ├── packages/
 │   ├── shared/          # @dext7r/npvm-shared - 共享类型和工具
 │   ├── server/          # @dext7r/npvm-server - Fastify 后端服务
@@ -157,7 +160,7 @@ pnpm clean
 
 ## Star 趋势
 
-[![Star History Chart](https://api.star-history.com/svg?repos=h7ml/NPVM&type=Date)](https://star-history.com/#h7ml/NPVM&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=h7ml/npvm&type=Date)](https://star-history.com/#h7ml/npvm&Date)
 
 ## 许可证
 

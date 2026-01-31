@@ -13,8 +13,10 @@ import type {
   YarnTreeData,
   YarnAuditAdvisory,
 } from '@dext7r/npvm-shared';
-import type { PackageManagerAdapter, InstallOptions, UninstallOptions } from './base.js';
+import type { PackageManagerAdapter, InstallOptions, UninstallOptions, WorkspaceInfo } from './base.js';
 import { validatePackageNames, validateUrl } from '../utils/security.js';
+import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
 
 export class YarnAdapter implements PackageManagerAdapter {
   readonly type = 'yarn' as const;
@@ -31,6 +33,29 @@ export class YarnAdapter implements PackageManagerAdapter {
       };
     } catch {
       return { type: 'yarn', version: '', path: '', available: false };
+    }
+  }
+
+  async detectWorkspace(cwd: string): Promise<WorkspaceInfo> {
+    try {
+      const pkgPath = join(cwd, 'package.json');
+      if (!existsSync(pkgPath)) {
+        return { isWorkspace: false };
+      }
+
+      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+      if (!pkg.workspaces) {
+        return { isWorkspace: false };
+      }
+
+      // yarn workspaces info
+      const { stdout } = await execa('yarn', ['workspaces', 'info', '--json'], { cwd, reject: false });
+      const data = JSON.parse(stdout || '{}');
+      const packages = Object.keys(data);
+
+      return { isWorkspace: true, packages };
+    } catch {
+      return { isWorkspace: false };
     }
   }
 
@@ -110,8 +135,10 @@ export class YarnAdapter implements PackageManagerAdapter {
       validateUrl(options.registry);
     }
 
-    const args = ['add', ...packages];
+    const args = options?.global ? ['global', 'add', ...packages] : ['add', ...packages];
     if (options?.dev) args.push('--dev');
+    if (options?.workspace) args.push('-W');  // yarn workspace root
+    if (options?.filter) args.unshift('workspace', options.filter);  // yarn workspace <name> add
     if (options?.registry) args.push('--registry', options.registry);
 
     const operationId = randomUUID();
@@ -159,7 +186,9 @@ export class YarnAdapter implements PackageManagerAdapter {
     // 安全验证
     validatePackageNames(packages);
 
-    const args = options?.global ? ['global', 'remove', ...packages] : ['remove', ...packages];
+    let args = options?.global ? ['global', 'remove', ...packages] : ['remove', ...packages];
+    if (options?.workspace) args.push('-W');
+    if (options?.filter) args = ['workspace', options.filter, 'remove', ...packages];
 
     const operationId = randomUUID();
     const progress: OperationProgress = {

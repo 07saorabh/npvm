@@ -11,13 +11,14 @@ const DEMO_LINKS = [
   { name: 'Surge', url: 'https://npvm.surge.sh', icon: '⚡' },
   { name: 'Render', url: 'https://npvm.onrender.com', icon: '🎨' },
   { name: 'Railway', url: 'https://npvm.up.railway.app', icon: '🚂' },
+  { name: 'Kinsta', url: 'https://npvm.kinsta.page', icon: '🔥' },
 ];
 
 export function Footer() {
   const { t } = useTranslation();
 
   const mainLinks = [
-    { href: 'https://github.com/h7ml/NPVM', label: 'GitHub', icon: '⭐' },
+    { href: 'https://github.com/h7ml/npvm', label: 'GitHub', icon: '⭐' },
     { href: 'https://www.npmjs.com/package/@dext7r/npvm-cli', label: 'npm', icon: '📦' },
     { href: '/docs', label: 'Swagger API', icon: '📖' },
   ];

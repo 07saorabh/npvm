@@ -21,12 +21,29 @@ export interface PackageUpdateInfo {
   deprecated?: string;
 }
 
+export interface WorkspaceInfo {
+  isWorkspace: boolean;
+  packages?: string[];
+}
+
 export function usePackageManagers() {
   return useQuery({
     queryKey: ['pm', 'detect'],
     queryFn: async () => {
       const res = await fetchApi<PackageManagerInfo[]>('/pm/detect');
       return res.data || [];
+    },
+  });
+}
+
+export function useWorkspaceInfo() {
+  const { projectPath } = useAppStore();
+
+  return useQuery({
+    queryKey: ['project', 'workspace', projectPath],
+    queryFn: async () => {
+      const res = await fetchApi<WorkspaceInfo>('/project/workspace');
+      return res.data || { isWorkspace: false };
     },
   });
 }

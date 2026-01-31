@@ -125,6 +125,13 @@ export async function registerRoutes(app: FastifyInstance, state: AppState) {
     return { success: true, data: { path: state.projectPath, isGlobal: false } };
   });
 
+  // 检测 workspace
+  app.get('/api/project/workspace', async () => {
+    const adapter = getAdapter(state.currentPm);
+    const workspaceInfo = await adapter.detectWorkspace(state.projectPath);
+    return { success: true, data: workspaceInfo };
+  });
+
   // 浏览文件系统目录
   app.get<{ Querystring: { path?: string } }>('/api/fs/browse', async (request) => {
     const targetPath = request.query.path || homedir();

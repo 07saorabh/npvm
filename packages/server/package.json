@@ -1,7 +1,7 @@
 {
   "name": "@dext7r/npvm-server",
   "version": "0.1.0",
-  "description": "Fastify backend server for NPVM",
+  "description": "Fastify backend server for npvm",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/h7ml/NPVM.git",
+    "url": "git+https://github.com/h7ml/npvm.git",
     "directory": "packages/server"
   },
   "author": "h7ml",

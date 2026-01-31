@@ -1,6 +1,6 @@
 # @dext7r/npvm-cli
 
-NPVM 命令行工具，一键启动包管理可视化平台。
+npvm 命令行工具，一键启动包管理可视化平台。
 
 [![npm version](https://img.shields.io/npm/v/@dext7r/npvm-cli.svg)](https://www.npmjs.com/package/@dext7r/npvm-cli)
 

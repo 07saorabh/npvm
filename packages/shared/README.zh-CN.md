@@ -1,6 +1,6 @@
 # @dext7r/npvm-shared
 
-NPVM 共享类型和工具库。
+npvm 共享类型和工具库。
 
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 

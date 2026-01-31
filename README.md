@@ -1,12 +1,12 @@
 <div align="center">
 
-# NPVM
+# npvm
 
 **Node Package Manager Visual Platform**
 
 [![npm version](https://img.shields.io/npm/v/@dext7r/npvm-cli.svg)](https://www.npmjs.com/package/@dext7r/npvm-cli)
-[![CI](https://github.com/h7ml/NPVM/actions/workflows/ci.yml/badge.svg)](https://github.com/h7ml/NPVM/actions/workflows/ci.yml)
-[![Release](https://github.com/h7ml/NPVM/actions/workflows/release.yml/badge.svg)](https://github.com/h7ml/NPVM/actions/workflows/release.yml)
+[![CI](https://github.com/h7ml/npvm/actions/workflows/ci.yml/badge.svg)](https://github.com/h7ml/npvm/actions/workflows/ci.yml)
+[![Release](https://github.com/h7ml/npvm/actions/workflows/release.yml/badge.svg)](https://github.com/h7ml/npvm/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-9.x-orange)](https://pnpm.io/)
@@ -26,10 +26,10 @@
 
 ## Overview
 
-NPVM is a modern visual platform for managing Node.js packages. It provides a clean web interface to manage npm/yarn/pnpm/bun packages across global and project-level installations.
+npvm is a modern visual platform for managing Node.js packages. It provides a clean web interface to manage npm/yarn/pnpm/bun packages across global and project-level installations.
 
 <div align="center">
-  <img src="./docs/screenshot.png" alt="NPVM Screenshot" width="800" />
+  <img src="./docs/screenshot.png" alt="npvm Screenshot" width="800" />
 </div>
 
 ## Features
@@ -39,9 +39,12 @@ NPVM is a modern visual platform for managing Node.js packages. It provides a cl
 - **Registry Management** - Switch between npm, taobao, tencent, and other registries
 - **Package Operations** - Install, uninstall, and update packages with real-time progress
 - **Update Detection** - Check for package updates and deprecated packages
-- **Security Audit** - Scan for vulnerabilities in your dependencies
+- **Security Audit** - Scan for vulnerabilities with export options (JSON/CSV/HTML)
 - **Dependency Tree** - Visualize your dependency hierarchy
 - **Remote Repository Analysis** - Analyze GitHub/GitLab repos without cloning
+- **Package Detail Modal** - View detailed package info with fullscreen support
+- **package.json Import** - Import dependencies from local file or URL
+- **Version Check** - Compare local build with GitHub latest commit
 - **i18n Support** - English and Chinese interface
 - **Dark Mode** - Built-in dark theme support
 - **Swagger API** - RESTful API with Swagger documentation
@@ -65,8 +68,8 @@ npvm
 ### Install from source
 
 ```bash
-git clone https://github.com/h7ml/NPVM.git
-cd NPVM
+git clone https://github.com/h7ml/npvm.git
+cd npvm
 pnpm install
 pnpm dev
 ```
@@ -97,7 +100,7 @@ Or deploy manually:
 ## Project Structure
 
 ```
-NPVM/
+npvm/
 ├── packages/
 │   ├── shared/          # @dext7r/npvm-shared - Shared types and utilities
 │   ├── server/          # @dext7r/npvm-server - Fastify backend server
@@ -163,7 +166,7 @@ See [CHANGELOG.md](./CHANGELOG.md) for release history.
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=h7ml/NPVM&type=Date)](https://star-history.com/#h7ml/NPVM&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=h7ml/npvm&type=Date)](https://star-history.com/#h7ml/npvm&Date)
 
 ## License
 

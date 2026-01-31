@@ -12,6 +12,27 @@ import { Changelog } from './pages/Changelog';
 import { useEffect } from 'react';
 import { useAppStore } from './stores/app';
 import { ToastProvider } from './components/ui/Toast';
+import { useSEO } from './hooks/useSEO';
+
+function AppRoutes() {
+  useSEO();
+
+  return (
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Dashboard />} />
+        <Route path="packages" element={<Packages />} />
+        <Route path="dependencies" element={<Dependencies />} />
+        <Route path="security" element={<Security />} />
+        <Route path="remote" element={<RemoteAnalysis />} />
+        <Route path="guide" element={<Docs />} />
+        <Route path="changelog" element={<Changelog />} />
+        <Route path="settings" element={<Settings />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
+  );
+}
 
 export default function App() {
   const { isDarkMode } = useAppStore();
@@ -23,19 +44,7 @@ export default function App() {
   return (
     <ToastProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="packages" element={<Packages />} />
-            <Route path="dependencies" element={<Dependencies />} />
-            <Route path="security" element={<Security />} />
-            <Route path="remote" element={<RemoteAnalysis />} />
-            <Route path="guide" element={<Docs />} />
-            <Route path="changelog" element={<Changelog />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
+        <AppRoutes />
       </BrowserRouter>
     </ToastProvider>
   );

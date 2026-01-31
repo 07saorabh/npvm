@@ -1,6 +1,6 @@
 # @dext7r/npvm-cli
 
-NPVM command line tool for launching the visual package management platform.
+npvm command line tool for launching the visual package management platform.
 
 [![npm version](https://img.shields.io/npm/v/@dext7r/npvm-cli.svg)](https://www.npmjs.com/package/@dext7r/npvm-cli)
 

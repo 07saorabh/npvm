@@ -12,10 +12,19 @@ export interface InstallOptions {
   dev?: boolean;
   global?: boolean;
   registry?: string;
+  workspace?: boolean;  // 安装到 workspace 根目录
+  filter?: string;      // 安装到指定 workspace 包
 }
 
 export interface UninstallOptions {
   global?: boolean;
+  workspace?: boolean;
+  filter?: string;
+}
+
+export interface WorkspaceInfo {
+  isWorkspace: boolean;
+  packages?: string[];  // workspace 包列表
 }
 
 export interface PackageManagerAdapter {
@@ -26,6 +35,9 @@ export interface PackageManagerAdapter {
   getInstalledPackages(cwd: string): Promise<InstalledPackage[]>;
 
   getGlobalPackages(): Promise<InstalledPackage[]>;
+
+  // 检测是否为 workspace 项目
+  detectWorkspace(cwd: string): Promise<WorkspaceInfo>;
 
   install(
     packages: string[],

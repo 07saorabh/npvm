@@ -15,12 +15,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/h7ml/NPVM.git",
+    "url": "git+https://github.com/h7ml/npvm.git",
     "directory": "packages/cli"
   },
-  "homepage": "https://github.com/h7ml/NPVM#readme",
+  "homepage": "https://github.com/h7ml/npvm#readme",
   "bugs": {
-    "url": "https://github.com/h7ml/NPVM/issues"
+    "url": "https://github.com/h7ml/npvm/issues"
   },
   "author": "h7ml",
   "license": "MIT",

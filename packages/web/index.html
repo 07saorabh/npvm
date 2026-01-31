@@ -1,13 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NPVM - Node Package Manager Visual</title>
-  </head>
-  <body class="bg-gray-50 dark:bg-gray-900">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO Meta Tags -->
+  <title>npvm - Node Package Manager Visual Platform</title>
+  <meta name="description"
+    content="A modern visual platform for managing Node.js packages. Supports npm, yarn, pnpm, and bun with a clean web interface. Features security audit, dependency tree, remote analysis." />
+  <meta name="keywords"
+    content="npm, yarn, pnpm, bun, node.js, package manager, visual, web ui, dependency, security audit" />
+  <meta name="author" content="h7ml" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://npvm.zeabur.app" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://npvm.zeabur.app" />
+  <meta property="og:title" content="npvm - Node Package Manager Visual Platform" />
+  <meta property="og:description"
+    content="A modern visual platform for managing Node.js packages. Supports npm, yarn, pnpm, and bun." />
+  <meta property="og:image" content="https://npvm.zeabur.app/og-image.png" />
+  <meta property="og:site_name" content="npvm" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="zh_CN" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://npvm.zeabur.app" />
+  <meta name="twitter:title" content="npvm - Node Package Manager Visual Platform" />
+  <meta name="twitter:description"
+    content="A modern visual platform for managing Node.js packages. Supports npm, yarn, pnpm, and bun." />
+  <meta name="twitter:image" content="https://npvm.zeabur.app/og-image.png" />
+
+  <!-- RSS/Atom -->
+  <link rel="alternate" type="application/rss+xml" title="npvm RSS Feed" href="/rss.xml" />
+  <link rel="alternate" type="application/atom+xml" title="npvm Atom Feed" href="/atom.xml" />
+
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#6366f1" />
+  <meta name="msapplication-TileColor" content="#6366f1" />
+
+  <!-- Analytics -->
+  <script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+  <script>LA.init({ id: "L5QobtaY94dTDisB", ck: "L5QobtaY94dTDisB", autoTrack: true, hashMode: true, screenRecord: true })</script>
+  <script>
+    !(function (c, i, e, b) {
+      var h = i.createElement("script");
+      var f = i.getElementsByTagName("script")[0];
+      h.type = "text/javascript";
+      h.crossorigin = true;
+      h.onload = function () { new c[b]["Monitor"]().init({ id: "L5Qpyb23m4poZdr2", sendSpaPv: true }); };
+      f.parentNode.insertBefore(h, f); h.src = e;
+    })(window, document, "https://sdk.51.la/perf/js-sdk-perf.min.js", "LingQue");
+  </script>
+</head>
+
+<body class="bg-gray-50 dark:bg-gray-900">
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>

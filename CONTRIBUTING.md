@@ -1,6 +1,6 @@
-# Contributing to NPVM
+# Contributing to npvm
 
-Thank you for your interest in contributing to NPVM! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to npvm! This document provides guidelines and instructions for contributing.
 
 ## Code of Conduct
 
@@ -19,8 +19,8 @@ By participating in this project, you agree to maintain a respectful and inclusi
 1. Fork the repository
 2. Clone your fork:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/NPVM.git
-   cd NPVM
+   git clone https://github.com/YOUR_USERNAME/npvm.git
+   cd npvm
    ```
 3. Install dependencies:
    ```bash
@@ -38,10 +38,11 @@ By participating in this project, you agree to maintain a respectful and inclusi
 ## Project Structure
 
 ```
-NPVM/
+npvm/
 ├── packages/
 │   ├── shared/     # Shared types and utilities
 │   ├── server/     # Fastify backend
+│   ├── cli/        # CLI entry point
 │   └── web/        # React frontend
 ├── .github/        # GitHub workflows and templates
 └── docs/           # Documentation

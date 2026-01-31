@@ -21,6 +21,8 @@ import {
   CircleDot,
   Clock,
   X,
+  RefreshCw,
+  GitCommit,
   type LucideIcon,
 } from 'lucide-react';
 import { Card, Button, Badge, Spinner } from '../components/ui';
@@ -44,11 +46,25 @@ interface RepoInfo {
   topics: string[];
 }
 
+interface CommitInfo {
+  sha: string;
+  commit: { committer: { date: string } };
+}
+
 interface NavItem {
   key: string;
   label: string;
   icon: LucideIcon;
 }
+
+// 获取构建信息
+const buildInfo = typeof __BUILD_INFO__ !== 'undefined' ? __BUILD_INFO__ : {
+  commitHash: 'dev',
+  commitShort: 'dev',
+  commitTime: '',
+  branch: 'main',
+  buildTime: new Date().toISOString(),
+};
 
 export function Settings() {
   const { t, i18n } = useTranslation();
@@ -76,6 +92,9 @@ export function Settings() {
   const [repoLoading, setRepoLoading] = useState(true);
   const [repoError, setRepoError] = useState(false);
   const [folderPickerOpen, setFolderPickerOpen] = useState(false);
+  const [versionStatus, setVersionStatus] = useState<'idle' | 'checking' | 'upToDate' | 'updateAvailable' | 'error'>('idle');
+  const [latestCommit, setLatestCommit] = useState<CommitInfo | null>(null);
+  const [commitsAhead, setCommitsAhead] = useState(0);
 
   const navItems: NavItem[] = [
     { key: 'connection', label: t('settings.apiBase'), icon: Server },
@@ -84,6 +103,7 @@ export function Settings() {
     { key: 'project', label: t('settings.projectPath'), icon: FolderOpen },
     { key: 'registry', label: t('settings.registry'), icon: Globe },
     { key: 'cache', label: t('settings.cache'), icon: Trash2 },
+    { key: 'version', label: t('settings.versionCheck'), icon: GitCommit },
     { key: 'about', label: t('settings.about'), icon: Info },
   ];
 
@@ -179,6 +199,37 @@ export function Settings() {
       .catch(() => setRepoError(true))
       .finally(() => setRepoLoading(false));
   }, []);
+
+  const handleCheckVersion = async () => {
+    setVersionStatus('checking');
+    try {
+      // 获取最新 commit
+      const res = await fetch(`${GITHUB_API}/commits?per_page=1`);
+      if (!res.ok) throw new Error('Failed to fetch');
+      const commits: CommitInfo[] = await res.json();
+      const latest = commits[0];
+      setLatestCommit(latest);
+
+      if (buildInfo.commitHash === 'dev' || buildInfo.commitHash === 'unknown') {
+        setVersionStatus('upToDate');
+        return;
+      }
+
+      if (latest.sha === buildInfo.commitHash) {
+        setVersionStatus('upToDate');
+      } else {
+        // 获取当前 commit 到最新 commit 之间的提交数
+        const compareRes = await fetch(`${GITHUB_API}/compare/${buildInfo.commitHash}...${latest.sha}`);
+        if (compareRes.ok) {
+          const compareData = await compareRes.json();
+          setCommitsAhead(compareData.ahead_by || 0);
+        }
+        setVersionStatus('updateAvailable');
+      }
+    } catch {
+      setVersionStatus('error');
+    }
+  };
 
   const themeOptions = [
     { value: 'light' as const, label: t('settings.themeLight'), icon: Sun },
@@ -468,6 +519,95 @@ export function Settings() {
           </Card>
         );
 
+      case 'version':
+        return (
+          <Card>
+            <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-2">
+              {t('settings.versionCheck')}
+            </h3>
+            <p className="text-sm text-gray-500 mb-4">{t('settings.versionCheckHint')}</p>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800">
+                  <div className="text-sm text-gray-500 mb-1">{t('settings.currentVersion')}</div>
+                  <div className="font-mono text-sm text-gray-800 dark:text-gray-200">
+                    {buildInfo.commitShort}
+                  </div>
+                  {buildInfo.commitTime && (
+                    <div className="text-xs text-gray-400 mt-1">
+                      {new Date(buildInfo.commitTime).toLocaleString()}
+                    </div>
+                  )}
+                </div>
+                <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800">
+                  <div className="text-sm text-gray-500 mb-1">{t('settings.buildTime')}</div>
+                  <div className="font-mono text-sm text-gray-800 dark:text-gray-200">
+                    {new Date(buildInfo.buildTime).toLocaleDateString()}
+                  </div>
+                  <div className="text-xs text-gray-400 mt-1">
+                    {new Date(buildInfo.buildTime).toLocaleTimeString()}
+                  </div>
+                </div>
+              </div>
+
+              {latestCommit && (
+                <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                  <div className="text-sm text-gray-500 mb-1">{t('settings.latestVersion')}</div>
+                  <div className="font-mono text-sm text-gray-800 dark:text-gray-200">
+                    {latestCommit.sha.slice(0, 7)}
+                  </div>
+                  <div className="text-xs text-gray-400 mt-1">
+                    {new Date(latestCommit.commit.committer.date).toLocaleString()}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={handleCheckVersion}
+                  loading={versionStatus === 'checking'}
+                  leftIcon={<RefreshCw size={16} className={versionStatus === 'checking' ? 'animate-spin' : ''} />}
+                >
+                  {versionStatus === 'checking' ? t('settings.checking') : t('settings.checkUpdate')}
+                </Button>
+
+                {versionStatus === 'upToDate' && (
+                  <Badge variant="success">
+                    <Check size={12} className="mr-1" />
+                    {t('settings.upToDate')}
+                  </Badge>
+                )}
+
+                {versionStatus === 'updateAvailable' && (
+                  <Badge variant="warning">
+                    {commitsAhead > 0 ? t('settings.commitsAhead', { count: commitsAhead }) : t('settings.updateAvailable')}
+                  </Badge>
+                )}
+
+                {versionStatus === 'error' && (
+                  <Badge variant="error">
+                    <AlertCircle size={12} className="mr-1" />
+                    {t('settings.checkFailed')}
+                  </Badge>
+                )}
+              </div>
+
+              {versionStatus === 'updateAvailable' && (
+                <a
+                  href={`${GITHUB_URL}/releases`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 dark:text-primary-400 text-sm font-medium"
+                >
+                  {t('settings.goToRelease')}
+                  <ExternalLink size={14} />
+                </a>
+              )}
+            </div>
+          </Card>
+        );
+
       case 'about':
         return (
           <Card>
@@ -492,7 +632,7 @@ export function Settings() {
                     </div>
                   )}
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">NPVM</h3>
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">npvm</h3>
                     <p className="text-sm text-gray-500 mt-1">
                       {repoInfo?.description || t('settings.description')}
                     </p>

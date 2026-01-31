@@ -1,12 +1,13 @@
-import { Moon, Sun, FolderOpen, Languages, Menu, ChevronDown, X, Globe, Clock, Trash2 } from 'lucide-react';
+import { Moon, Sun, FolderOpen, Languages, Menu, ChevronDown, X, Globe, Clock, Trash2, Layers } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAppStore } from '../../stores/app';
-import { usePackageManagers } from '../../hooks/usePackages';
+import { usePackageManagers, useWorkspaceInfo } from '../../hooks/usePackages';
 import { fetchApi } from '../../lib/api';
 import { Select } from '../ui/Select';
 import { Tooltip } from '../ui/Tooltip';
 import { useToast } from '../ui/Toast';
+import { Badge } from '../ui/Badge';
 import type { PackageManagerType } from '@dext7r/npvm-shared';
 import { useCallback, useMemo, useState, useRef, useEffect } from 'react';
 import { clsx } from 'clsx';
@@ -48,6 +49,7 @@ export function Header() {
     setMobileMenuOpen,
   } = useAppStore();
   const { data: managers = [] } = usePackageManagers();
+  const { data: workspaceInfo } = useWorkspaceInfo();
   const { addToast } = useToast();
   const queryClient = useQueryClient();
   const [showPathDropdown, setShowPathDropdown] = useState(false);
@@ -142,10 +144,13 @@ export function Header() {
               'hover:bg-gray-50 dark:hover:bg-gray-600'
             )}
           >
-            {isGlobal ? <Globe size={16} /> : <FolderOpen size={16} />}
+            {isGlobal ? <Globe size={16} /> : workspaceInfo?.isWorkspace ? <Layers size={16} /> : <FolderOpen size={16} />}
             <span className="truncate">
               {isGlobal ? t('packages.globalMode') : truncatePath(projectPath)}
             </span>
+            {workspaceInfo?.isWorkspace && !isGlobal && (
+              <Badge variant="info" size="sm">Workspace</Badge>
+            )}
             <ChevronDown size={14} className={clsx('transition-transform', showPathDropdown && 'rotate-180')} />
           </button>
 

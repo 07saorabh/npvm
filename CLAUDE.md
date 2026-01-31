@@ -66,3 +66,11 @@ React 18 + Vite + TailwindCSS。开发模式下 Vite 代理 `/api` 到 `localhos
 - **生产托管** — Server 直接托管 `packages/web/dist` 静态文件并提供 SPA 回退，无需额外 Web 服务器。
 - **国际化** — 所有用户可见文案通过 `react-i18next`，修改 UI 文案时需同步更新 `en.json` 和 `zh.json`。
 - **UI 组件** — 始终使用 `src/components/ui/` 中的组件（Card、Button、Badge 等），禁止使用原生 HTML 元素。
+- **构建时版本注入** — Vite 构建时通过 `define` 注入 `__BUILD_INFO__`（commit hash、构建时间），用于版本检测。
+
+## 最新功能
+
+- **版本检测** — 设置页面支持检查 GitHub 最新 commit，对比当前构建版本
+- **包详情弹窗** — 支持全屏切换，显示包的完整信息（作者、许可证、依赖等）
+- **package.json 导入** — 支持从本地文件或 URL 导入 package.json 批量安装依赖
+- **多平台部署** — 支持 Zeabur、Vercel、Cloudflare、Netlify、Deno、Surge、Render、Railway、Kinsta 等平台

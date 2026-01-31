@@ -1,6 +1,6 @@
 # @dext7r/npvm-server
 
-NPVM backend service built with Fastify.
+npvm backend service built with Fastify.
 
 **[Live Demo](https://npvm.zeabur.app)** | **[API Docs](https://npvm.zeabur.app/docs)**
 

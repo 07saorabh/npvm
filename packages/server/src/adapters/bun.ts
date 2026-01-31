@@ -12,8 +12,10 @@ import type {
   NpmAuditVulnerability,
   NpmAuditAdvisory,
 } from '@dext7r/npvm-shared';
-import type { PackageManagerAdapter, InstallOptions, UninstallOptions } from './base.js';
+import type { PackageManagerAdapter, InstallOptions, UninstallOptions, WorkspaceInfo } from './base.js';
 import { validatePackageNames, validateUrl } from '../utils/security.js';
+import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
 
 export class BunAdapter implements PackageManagerAdapter {
   readonly type = 'bun' as const;
@@ -30,6 +32,27 @@ export class BunAdapter implements PackageManagerAdapter {
       };
     } catch {
       return { type: 'bun', version: '', path: '', available: false };
+    }
+  }
+
+  async detectWorkspace(cwd: string): Promise<WorkspaceInfo> {
+    try {
+      const pkgPath = join(cwd, 'package.json');
+      if (!existsSync(pkgPath)) {
+        return { isWorkspace: false };
+      }
+
+      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+      // bun 支持 package.json 中的 workspaces 字段
+      if (!pkg.workspaces) {
+        return { isWorkspace: false };
+      }
+
+      // bun 使用与 npm/yarn 相同的 workspaces 格式
+      const workspaces = Array.isArray(pkg.workspaces) ? pkg.workspaces : pkg.workspaces.packages || [];
+      return { isWorkspace: true, packages: workspaces };
+    } catch {
+      return { isWorkspace: false };
     }
   }
 
@@ -98,6 +121,8 @@ export class BunAdapter implements PackageManagerAdapter {
     const args = ['add', ...packages];
     if (options?.dev) args.push('--dev');
     if (options?.global) args.push('-g');
+    // bun 目前不支持 workspace 特定安装，但支持 --cwd 指定目录
+    if (options?.filter) args.push('--cwd', options.filter);
 
     const operationId = randomUUID();
     const progress: OperationProgress = {
@@ -146,6 +171,7 @@ export class BunAdapter implements PackageManagerAdapter {
 
     const args = ['remove', ...packages];
     if (options?.global) args.push('-g');
+    if (options?.filter) args.push('--cwd', options.filter);
 
     const operationId = randomUUID();
     const progress: OperationProgress = {

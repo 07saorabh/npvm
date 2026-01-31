@@ -1,8 +1,27 @@
 {
   "en": [
     {
+      "version": "0.2.0",
+      "date": "2026-02-01",
+      "changes": [
+        { "type": "feature", "text": "Version check - compare local build with GitHub latest commit" },
+        { "type": "feature", "text": "Package detail modal with fullscreen toggle support" },
+        { "type": "feature", "text": "Import dependencies from package.json (local file or URL)" },
+        { "type": "feature", "text": "Clickable sidebar title to navigate to dashboard" },
+        { "type": "feature", "text": "Dynamic SEO routes (sitemap.xml, rss.xml, atom.xml, robots.txt)" },
+        { "type": "feature", "text": "Page-level SEO meta tags with route-based updates" },
+        { "type": "feature", "text": "Deployment guide with multiple platform demos" },
+        { "type": "feature", "text": "FAQ section in documentation" },
+        { "type": "feature", "text": "Refresh button spin animation when fetching packages" },
+        { "type": "improvement", "text": "Enhanced documentation with new features and deployment guide" },
+        { "type": "improvement", "text": "Updated i18n translations for all new features" },
+        { "type": "fix", "text": "Fixed component creation during render in RepoInfoCard" },
+        { "type": "fix", "text": "Fixed animation state management in ConfirmDialog" }
+      ]
+    },
+    {
       "version": "0.1.0",
-      "date": "2025-01-31",
+      "date": "2026-01-31",
       "changes": [
         { "type": "feature", "text": "Dashboard with package manager overview" },
         { "type": "feature", "text": "Package management (install/uninstall/update) with batch support" },
@@ -20,8 +39,27 @@
   ],
   "zh": [
     {
+      "version": "0.2.0",
+      "date": "2026-02-01",
+      "changes": [
+        { "type": "feature", "text": "版本检测：对比本地构建与 GitHub 最新提交" },
+        { "type": "feature", "text": "包详情弹窗：支持全屏切换" },
+        { "type": "feature", "text": "从 package.json 导入依赖（本地文件或 URL）" },
+        { "type": "feature", "text": "侧边栏标题可点击跳转到仪表盘" },
+        { "type": "feature", "text": "动态 SEO 路由（sitemap.xml、rss.xml、atom.xml、robots.txt）" },
+        { "type": "feature", "text": "页面级 SEO meta 标签，随路由自动更新" },
+        { "type": "feature", "text": "部署指南：多平台演示链接" },
+        { "type": "feature", "text": "文档新增常见问题（FAQ）" },
+        { "type": "feature", "text": "刷新按钮加载动画" },
+        { "type": "improvement", "text": "完善文档：新功能介绍和部署指南" },
+        { "type": "improvement", "text": "更新所有新功能的国际化翻译" },
+        { "type": "fix", "text": "修复 RepoInfoCard 渲染时创建组件的问题" },
+        { "type": "fix", "text": "修复 ConfirmDialog 动画状态管理问题" }
+      ]
+    },
+    {
       "version": "0.1.0",
-      "date": "2025-01-31",
+      "date": "2026-01-31",
       "changes": [
         { "type": "feature", "text": "仪表盘：包管理器概览与快捷操作" },
         { "type": "feature", "text": "包管理：安装/卸载/更新，支持批量安装与版本指定" },
