@@ -2,13 +2,16 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../stores/app';
 import { REGISTRIES } from '@dext7r/npvm-shared';
-import { fetchApi } from '../lib/api';
+import { fetchApi, getApiBase, setApiBase } from '../lib/api';
+import { Check, AlertCircle } from 'lucide-react';
 
 export function Settings() {
   const { t, i18n } = useTranslation();
   const { projectPath, setProjectPath, currentRegistry, setCurrentRegistry } = useAppStore();
   const [localPath, setLocalPath] = useState(projectPath);
   const [registryStatuses, setRegistryStatuses] = useState<Record<string, boolean>>({});
+  const [apiBaseUrl, setApiBaseUrl] = useState(getApiBase());
+  const [apiStatus, setApiStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
 
   useEffect(() => {
     fetchApi<{ name: string; url: string; connected: boolean }[]>('/registry/list').then(
@@ -44,11 +47,75 @@ export function Settings() {
     i18n.changeLanguage(lng);
   };
 
+  const handleTestApiBase = async () => {
+    setApiStatus('testing');
+    try {
+      const testUrl = apiBaseUrl.replace(/\/$/, '') + '/pm/detect';
+      const response = await fetch(testUrl, { method: 'GET' });
+      if (response.ok) {
+        setApiStatus('success');
+        setApiBase(apiBaseUrl);
+        setTimeout(() => window.location.reload(), 500);
+      } else {
+        setApiStatus('error');
+      }
+    } catch {
+      setApiStatus('error');
+    }
+  };
+
+  const handleResetApiBase = () => {
+    setApiBase('');
+    setApiBaseUrl('/api');
+    setApiStatus('idle');
+    window.location.reload();
+  };
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
         {t('settings.title')}
       </h1>
+
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-2">
+          {t('settings.apiBase')}
+        </h3>
+        <p className="text-sm text-gray-500 mb-4">{t('settings.apiBaseHint')}</p>
+        <div className="flex gap-3">
+          <input
+            type="text"
+            value={apiBaseUrl}
+            onChange={(e) => { setApiBaseUrl(e.target.value); setApiStatus('idle'); }}
+            className="flex-1 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-transparent text-gray-800 dark:text-gray-200 font-mono text-sm"
+            placeholder="https://npvm.zeabur.app/api"
+          />
+          <button
+            onClick={handleTestApiBase}
+            disabled={apiStatus === 'testing'}
+            className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 flex items-center gap-2"
+          >
+            {apiStatus === 'testing' && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+            {apiStatus === 'success' && <Check size={16} />}
+            {apiStatus === 'error' && <AlertCircle size={16} />}
+            {t('settings.testConnection')}
+          </button>
+          {apiBaseUrl !== '/api' && (
+            <button
+              onClick={handleResetApiBase}
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+            >
+              {t('settings.reset')}
+            </button>
+          )}
+        </div>
+        {apiStatus === 'error' && (
+          <p className="mt-2 text-sm text-red-500">{t('settings.connectionFailed')}</p>
+        )}
+        {apiStatus === 'success' && (
+          <p className="mt-2 text-sm text-green-500">{t('settings.connectionSuccess')}</p>
+        )}
+      </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
         <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-4">

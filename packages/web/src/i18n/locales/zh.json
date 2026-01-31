@@ -79,7 +79,13 @@
     "title": "设置",
     "projectPath": "项目路径",
     "registry": "镜像源",
-    "language": "语言"
+    "language": "语言",
+    "apiBase": "后端 API",
+    "apiBaseHint": "连接远程 NPVM 服务器（如 https://npvm.zeabur.app/api）或使用本地 /api",
+    "testConnection": "测试",
+    "reset": "重置",
+    "connectionFailed": "连接失败，请检查地址",
+    "connectionSuccess": "连接成功！正在刷新..."
   },
   "terminal": {
     "title": "终端",

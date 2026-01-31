@@ -79,7 +79,13 @@
     "title": "Settings",
     "projectPath": "Project Path",
     "registry": "Registry",
-    "language": "Language"
+    "language": "Language",
+    "apiBase": "Backend API",
+    "apiBaseHint": "Connect to a remote NPVM server (e.g., https://npvm.zeabur.app/api) or use local /api",
+    "testConnection": "Test",
+    "reset": "Reset",
+    "connectionFailed": "Connection failed. Please check the URL.",
+    "connectionSuccess": "Connected! Reloading..."
   },
   "terminal": {
     "title": "Terminal",

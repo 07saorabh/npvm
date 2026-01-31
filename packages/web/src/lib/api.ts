@@ -1,11 +1,25 @@
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+const API_BASE_KEY = 'npvm-api-base';
+const DEFAULT_API_BASE = import.meta.env.VITE_API_URL || '/api';
+
+export function getApiBase(): string {
+  if (typeof window === 'undefined') return DEFAULT_API_BASE;
+  return localStorage.getItem(API_BASE_KEY) || DEFAULT_API_BASE;
+}
+
+export function setApiBase(url: string): void {
+  if (url && url !== '/api') {
+    localStorage.setItem(API_BASE_KEY, url.replace(/\/$/, ''));
+  } else {
+    localStorage.removeItem(API_BASE_KEY);
+  }
+}
 
 export async function fetchApi<T>(
   endpoint: string,
   options?: RequestInit
 ): Promise<{ success: boolean; data?: T; error?: string }> {
   try {
-    const response = await fetch(`${API_BASE}${endpoint}`, {
+    const response = await fetch(`${getApiBase()}${endpoint}`, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -29,7 +43,7 @@ export function createSSEConnection(
   onDone?: () => void,
   onError?: (error: string) => void
 ) {
-  fetch(`${API_BASE}${endpoint}`, {
+  fetch(`${getApiBase()}${endpoint}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
