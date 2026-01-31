@@ -16,6 +16,8 @@
 
 **[Live Demo](https://npvm.zeabur.app)** | **[API Docs](https://npvm.zeabur.app/docs)**
 
+[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/templates/NPVM)
+
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 
 </div>
