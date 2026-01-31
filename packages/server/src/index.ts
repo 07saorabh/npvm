@@ -94,10 +94,7 @@ export async function createServer(options: ServerOptions = {}) {
   // 注册 API 路由
   await registerRoutes(app, state);
 
-  // 注册 SEO 路由 (sitemap, rss, atom, robots.txt)
-  await registerSeoRoutes(app);
-
-  // 静态文件服务（前端构建产物）
+  // 静态文件服务（前端构建产物）- 必须在 SEO 路由之前注册
   const webDistPath = join(__dirname, '../../web/dist');
   if (existsSync(webDistPath)) {
     await app.register(fastifyStatic, {
@@ -105,7 +102,7 @@ export async function createServer(options: ServerOptions = {}) {
       prefix: '/',
       wildcard: false,
     });
-    // SPA fallback：非 API/docs 路由返回 index.html
+    // SPA fallback：非 API/docs/SEO 路由返回 index.html
     app.setNotFoundHandler((req, reply) => {
       if (req.url.startsWith('/api') || req.url.startsWith('/docs')) {
         reply.code(404).send({ error: 'Not Found' });
@@ -118,6 +115,9 @@ export async function createServer(options: ServerOptions = {}) {
       reply.type('text/html').send(getLandingPage(port));
     });
   }
+
+  // 注册 SEO 路由 (sitemap, rss, atom, robots.txt) - 在静态文件之后注册以覆盖静态文件处理
+  await registerSeoRoutes(app);
 
   return { app, port, host };
 }
