@@ -224,40 +224,6 @@ export function Docs() {
           ))}
         </div>
       </DocSection>
-
-      {/* 底部链接 */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">{t('docs.links')}</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {[
-            { href: 'https://github.com/h7ml/NPVM', label: 'GitHub', icon: '⭐' },
-            { href: 'https://www.npmjs.com/package/@dext7r/npvm-cli', label: 'npm', icon: '📦' },
-            { href: 'https://npvm.zeabur.app', label: t('docs.liveDemo'), icon: '🚀' },
-            { href: '/docs', label: 'Swagger API', icon: '📖' },
-          ].map(({ href, label, icon }) => (
-            <a
-              key={href}
-              href={href}
-              target={href.startsWith('http') ? '_blank' : undefined}
-              rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
-              className="flex items-center gap-2 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              <span className="text-xl">{icon}</span>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
-              {href.startsWith('http') && <ExternalLink size={12} className="text-gray-400" />}
-            </a>
-          ))}
-        </div>
-        <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>
-            {t('docs.builtWith')}{' '}
-            <a href="https://github.com/h7ml" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:underline">
-              h7ml
-            </a>
-          </p>
-          <p className="mt-1">MIT License © 2026</p>
-        </div>
-      </div>
     </div>
   );
 }

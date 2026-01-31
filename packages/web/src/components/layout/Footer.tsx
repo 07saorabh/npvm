@@ -1,0 +1,43 @@
+import { useTranslation } from 'react-i18next';
+import { ExternalLink } from 'lucide-react';
+
+export function Footer() {
+  const { t } = useTranslation();
+
+  const links = [
+    { href: 'https://github.com/h7ml/NPVM', label: 'GitHub', icon: '⭐' },
+    { href: 'https://www.npmjs.com/package/@dext7r/npvm-cli', label: 'npm', icon: '📦' },
+    { href: 'https://npvm.zeabur.app', label: t('docs.liveDemo'), icon: '🚀' },
+    { href: '/docs', label: 'Swagger API', icon: '📖' },
+  ];
+
+  return (
+    <footer className="mt-8 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+        <div className="flex flex-wrap items-center justify-center gap-4">
+          {links.map(({ href, label, icon }) => (
+            <a
+              key={href}
+              href={href}
+              target={href.startsWith('http') ? '_blank' : undefined}
+              rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-sm"
+            >
+              <span>{icon}</span>
+              <span className="font-medium text-gray-700 dark:text-gray-300">{label}</span>
+              {href.startsWith('http') && <ExternalLink size={12} className="text-gray-400" />}
+            </a>
+          ))}
+        </div>
+        <div className="mt-3 text-center text-xs text-gray-500 dark:text-gray-400">
+          <span>{t('docs.builtWith')} </span>
+          <a href="https://github.com/h7ml" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:underline">
+            h7ml
+          </a>
+          <span className="mx-2">•</span>
+          <span>MIT License © 2026</span>
+        </div>
+      </div>
+    </footer>
+  );
+}

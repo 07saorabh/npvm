@@ -28,7 +28,7 @@ export default function App() {
             <Route path="dependencies" element={<Dependencies />} />
             <Route path="security" element={<Security />} />
             <Route path="remote" element={<RemoteAnalysis />} />
-            <Route path="docs" element={<Docs />} />
+            <Route path="guide" element={<Docs />} />
             <Route path="settings" element={<Settings />} />
           </Route>
         </Routes>

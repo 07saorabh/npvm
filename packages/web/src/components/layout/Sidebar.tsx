@@ -24,7 +24,7 @@ export function Sidebar() {
     { path: '/dependencies', icon: GitBranch, label: t('nav.dependencies') },
     { path: '/security', icon: Shield, label: t('nav.security') },
     { path: '/remote', icon: Globe, label: t('nav.remote') },
-    { path: '/docs', icon: BookOpen, label: t('nav.docs') },
+    { path: '/guide', icon: BookOpen, label: t('nav.docs') },
     { path: '/settings', icon: Settings, label: t('nav.settings') },
   ];
 
