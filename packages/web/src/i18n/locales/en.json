@@ -132,6 +132,7 @@
     "title": "Settings",
     "projectPath": "Project Path",
     "registry": "Registry",
+    "currentRegistry": "Current Registry",
     "language": "Language",
     "apiBase": "Backend API",
     "apiBaseHint": "Connect to a remote npvm server (e.g., https://npvm.zeabur.app/api) or use local /api",

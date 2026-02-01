@@ -84,6 +84,7 @@ export function Settings() {
   const [activeSection, setActiveSection] = useState('connection');
   const [localPath, setLocalPath] = useState(projectPath);
   const [registryStatuses, setRegistryStatuses] = useState<Record<string, boolean>>({});
+  const [currentRegistryUrl, setCurrentRegistryUrl] = useState<string>('');
   const [apiBaseUrl, setApiBaseUrl] = useState(getApiBase());
   const [apiStatus, setApiStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
   const [cacheStatus, setCacheStatus] = useState<'idle' | 'clearing' | 'success' | 'error'>('idle');
@@ -117,6 +118,13 @@ export function Settings() {
         }
       }
     );
+
+    // 获取当前所用的源
+    fetchApi<{ url: string }>('/registry/current').then((res) => {
+      if (res.data?.url) {
+        setCurrentRegistryUrl(res.data.url);
+      }
+    });
   }, []);
 
   const handleSavePath = async () => {
@@ -457,6 +465,19 @@ export function Settings() {
             <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-4">
               {t('settings.registry')}
             </h3>
+
+            {/* 当前所用源信息 */}
+            {currentRegistryUrl && (
+              <div className="mb-6 p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                <div className="text-sm text-blue-600 dark:text-blue-400 mb-1">
+                  {t('settings.currentRegistry') || 'Current Registry'}
+                </div>
+                <div className="font-mono text-sm text-blue-900 dark:text-blue-100 break-all">
+                  {currentRegistryUrl}
+                </div>
+              </div>
+            )}
+
             <div className="space-y-3">
               {REGISTRIES.map((reg) => (
                 <div
